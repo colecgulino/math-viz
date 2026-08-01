@@ -17,15 +17,10 @@
   <polyline points="8.0,80.0 312.0,80.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="8.0,50.0 312.0,50.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="8.0,20.0 312.0,20.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="78.0,140.0 128.2,114.9" fill="none" stroke="#bf5b2e" stroke-width="2.2" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M138.0,110.0 L130.2,119.1 L126.1,110.8 Z" fill="#bf5b2e" fill-opacity="1.0"/>
-  <polyline points="78.0,140.0 103.1,89.8" fill="none" stroke="#7d8447" stroke-width="2.2" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M108.0,80.0 L107.2,91.9 L98.9,87.8 Z" fill="#7d8447" fill-opacity="1.0"/>
-  <polyline points="138.0,110.0 188.2,84.9" fill="none" stroke="#bf5b2e" stroke-width="1.7" stroke-opacity="0.85" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
-  <path d="M198.0,80.0 L190.2,89.1 L186.1,80.8 Z" fill="#bf5b2e" fill-opacity="0.85"/>
-  <polyline points="198.0,80.0 223.1,29.8" fill="none" stroke="#7d8447" stroke-width="1.7" stroke-opacity="0.85" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
-  <path d="M228.0,20.0 L227.2,31.9 L218.9,27.8 Z" fill="#7d8447" fill-opacity="0.85"/>
-  <polyline points="78.0,140.0 219.4,26.9" fill="none" stroke="#2f2a25" stroke-width="2.8" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M228.0,20.0 L222.3,30.5 L216.5,23.3 Z" fill="#2f2a25" fill-opacity="1.0"/>
+  <polyline points="78.0,140.0 128.2,114.9" fill="none" stroke="#bf5b2e" stroke-width="2.2" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M138.0,110.0 L129.6,120.1 L124.9,110.6 Z" fill="#bf5b2e" fill-opacity="1.0"/>
+  <polyline points="78.0,140.0 103.1,89.8" fill="none" stroke="#7d8447" stroke-width="2.2" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M108.0,80.0 L107.4,93.1 L97.9,88.4 Z" fill="#7d8447" fill-opacity="1.0"/>
+  <polyline points="138.0,110.0 188.2,84.9" fill="none" stroke="#bf5b2e" stroke-width="1.7" stroke-opacity="0.85" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/><path d="M198.0,80.0 L189.6,90.1 L184.9,80.6 Z" fill="#bf5b2e" fill-opacity="0.85"/>
+  <polyline points="198.0,80.0 223.1,29.8" fill="none" stroke="#7d8447" stroke-width="1.7" stroke-opacity="0.85" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/><path d="M228.0,20.0 L227.4,33.1 L217.9,28.4 Z" fill="#7d8447" fill-opacity="0.85"/>
+  <polyline points="78.0,140.0 219.4,26.9" fill="none" stroke="#2f2a25" stroke-width="2.8" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M228.0,20.0 L221.9,31.6 L215.3,23.4 Z" fill="#2f2a25" fill-opacity="1.0"/>
   </g>
 </svg>

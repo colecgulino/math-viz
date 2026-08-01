@@ -11,7 +11,10 @@ step, no dependencies, no tracking — plain HTML, CSS and SVG.
 index.html                  landing page, grouped by area
 assets/theme.css            design tokens + shared page furniture
 assets/thumbs/*.svg         index-card thumbnails, generated
+assets/figures/*.svg        in-page explanatory diagrams, generated
+tools/svgkit.py             shared SVG drawing helpers + palette
 tools/gen_thumbs.py         regenerates the thumbnails
+tools/gen_figures.py        regenerates the figures
 <area>/<topic>/index.html   one directory per visualization
 ```
 
@@ -48,6 +51,17 @@ and the content ends up flush against the screen edge on narrow viewports.
    `python3 tools/gen_thumbs.py`.
 3. Add a card to the relevant area section in `index.html`, or start a new
    `<section class="topic">` if the area doesn't exist yet.
+
+Static diagrams for a page go in `tools/gen_figures.py`, which shares its
+geometry and palette with the thumbnails via `tools/svgkit.py`. Both scripts
+must be run from the `tools/` directory. Two conventions worth keeping:
+
+- **Write a multi-panel figure as one SVG per panel**, laid out with CSS grid.
+  A single wide SVG shrinks to fit a phone and takes its labels down to a few
+  pixels; separate panels can stack and stay readable.
+- **Use `boxed=` on labels in crowded diagrams.** It fills a plate-colored rect
+  behind the text so it survives sitting over a grid line or a crossing arrow,
+  which is usually the only place a label will fit.
 
 ## Local preview
 

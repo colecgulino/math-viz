@@ -14,6 +14,128 @@
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
     />
     <style>
+      /* ---- explainer prose ---- */
+      .jump {
+        display: inline-block;
+        margin-top: 18px;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .jump:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .explainer {
+        padding-block: 10px 6px;
+      }
+      .explainer > section + section {
+        margin-top: 46px;
+      }
+      .explainer h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+      }
+      .explainer p {
+        max-width: var(--measure);
+        margin: 0 0 17px;
+      }
+      .explainer figure {
+        margin: 26px 0 28px;
+        max-width: 800px;
+      }
+      .explainer figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      /* Two panels side by side, stacking on narrow screens so their labels
+         keep a legible size instead of shrinking to fit. */
+      .two-up {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+      }
+      .two-up figcaption {
+        grid-column: 1 / -1;
+      }
+      .fig-cap {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-500);
+        text-align: center;
+        margin: 12px 0 0 !important;
+      }
+      .explainer figcaption {
+        max-width: var(--measure);
+        margin-top: 14px;
+        font-size: 0.86rem;
+        color: var(--ink-400);
+      }
+      @media (max-width: 660px) {
+        .two-up {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+      }
+      /* Vector names in prose, matching the italic serif used in the figures. */
+      .sym {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-900);
+      }
+
+      .rules {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 10px 24px;
+        align-items: baseline;
+        max-width: var(--measure);
+        margin: 0 0 22px;
+        padding: 18px 20px;
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+      }
+      .rules dt {
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-400);
+      }
+      .rules dd {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        color: var(--ink-900);
+      }
+      .rules dd .alt {
+        display: inline-block;
+        margin-left: 18px;
+        color: var(--ink-500);
+      }
+      .rules-note {
+        font-size: 0.84rem !important;
+        color: var(--ink-400);
+      }
+      @media (max-width: 560px) {
+        .rules {
+          grid-template-columns: 1fr;
+          gap: 4px 0;
+        }
+        .rules dt {
+          margin-top: 10px;
+        }
+        .rules dd .alt {
+          display: block;
+          margin-left: 0;
+        }
+      }
+
       /* ---- board ---- */
       .board-wrap {
         position: relative;
@@ -229,9 +351,132 @@
         change them, then set coefficients below and watch the pieces lay
         themselves out tip to tail.
       </p>
+      <a class="jump" href="#board-section">Skip to the board &darr;</a>
     </header>
 
-    <div class="stage page">
+    <div class="explainer page">
+      <section>
+        <h2>Every vector is already a combination</h2>
+        <p>
+          Two vectors are hiding inside the grid below.
+          <span class="sym">î</span> points one unit along x;
+          <span class="sym">ĵ</span> points one unit along y. The hats mark them
+          as unit length, and the pair is called the
+          <em>standard basis</em>.
+        </p>
+        <p>
+          They matter because of what a coordinate actually is. When you write a
+          vector as (3, 2), that pair isn't the vector — it's a set of
+          instructions: take three copies of <span class="sym">î</span>, take
+          two copies of <span class="sym">ĵ</span>, add them.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/basis-standard.svg"
+              alt="The vector w reached as three steps along i-hat, then two along j-hat."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">w = 3î + 2ĵ</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/basis-custom.svg"
+              alt="The same vector w reached as half a step along a, then two and a half along b."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">w = 0.5a + 2.5b</p>
+          </div>
+          <figcaption>
+            The same arrow, counted two ways. Only the instructions change.
+          </figcaption>
+        </figure>
+
+        <p>
+          So (3, 2) <em>means</em> 3<span class="sym">î</span> +
+          2<span class="sym">ĵ</span> — which is a linear combination. Every
+          vector you put on the board is already one, and the x and y fields in
+          the glossary are simply its coefficients over
+          <span class="sym">î</span> and <span class="sym">ĵ</span>, with the
+          basis left unwritten because everyone agrees on it.
+        </p>
+        <p>
+          Nothing makes <span class="sym">î</span> and
+          <span class="sym">ĵ</span> special except that agreement. Take any two
+          vectors that don't lie along the same line and you can reach every
+          point in the plane with those instead. The arrow itself doesn't move;
+          only the numbers describing it change. The right panel above lands on
+          exactly the same point using <span class="sym">a</span> = (1, −1) and
+          <span class="sym">b</span> = (1, 1), where the instructions come out
+          0.5 and 2.5 instead of 3 and 2.
+        </p>
+        <p>
+          That is what the board below does. Your vectors take over the job of
+          <span class="sym">î</span> and <span class="sym">ĵ</span>, the
+          coefficient sliders are the coordinates of
+          <span class="sym">w</span> in the basis you built, and the dashed walk
+          is those instructions being carried out one step at a time.
+        </p>
+      </section>
+
+      <section>
+        <h2>Vectors are whatever obeys the rules</h2>
+        <p>
+          Notice that nothing in that argument depended on arrows. It used two
+          operations — adding two things together, and scaling one thing by a
+          number — and nothing else. Plenty of objects support exactly those
+          two: polynomials, audio signals, matrices, forces, the solutions of a
+          linear differential equation. Add two polynomials and you get a
+          polynomial; multiply one by three and you still have a polynomial.
+        </p>
+        <p>
+          Whenever a collection of objects comes with those two operations and
+          they behave the way the rules below require, the collection is called
+          a <strong>vector space</strong>, and its members are called vectors no
+          matter what they happen to look like.
+        </p>
+
+        <dl class="rules">
+          <dt>addition</dt>
+          <dd>u + v is in V</dd>
+          <dt>scaling</dt>
+          <dd>av is in V <span class="alt">a is a number, the “scalar”</span></dd>
+        </dl>
+
+        <p class="rules-note">
+          And for any u, v, w in the space and any numbers a, b:
+        </p>
+
+        <dl class="rules">
+          <dt>commutative</dt>
+          <dd>u + v = v + u</dd>
+          <dt>associative</dt>
+          <dd>(u + v) + w = u + (v + w) <span class="alt">a(bv) = (ab)v</span></dd>
+          <dt>distributive</dt>
+          <dd>a(u + v) = au + av <span class="alt">(a + b)v = av + bv</span></dd>
+          <dt>identity</dt>
+          <dd>v + 0 = v <span class="alt">1v = v</span></dd>
+          <dt>inverse</dt>
+          <dd>v + (−v) = 0</dd>
+        </dl>
+
+        <p>
+          One at a time these are unremarkable — they are the arithmetic you'd
+          assume without being told. What matters is everything that rests on
+          them. Span, linear independence, dimension, basis, rank: each of those
+          ideas is derived from this list alone, never from the fact that a
+          vector is an arrow. So something you establish by pushing arrows
+          around a grid is, with no extra work, also true of polynomials and
+          audio signals. The board below draws the two-dimensional case because
+          it fits on a screen; the reasoning it builds doesn't stop there.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="board-section">
       <div class="plate">
         <div class="board-wrap">
           <svg
@@ -280,25 +525,25 @@
     </div>
 
     <section class="notes page">
-      <h2>What you're looking at</h2>
+      <h2>Reading the board</h2>
       <p class="eq">w = c₁v₁ + c₂v₂ + … + cₙvₙ</p>
       <p>
-        Each coefficient stretches its vector — negative values flip it around
-        the origin — and the results are added nose to tail. The dashed path on
-        the grid is that addition happening one term at a time: start at the
-        origin, walk along c₁v₁, then from wherever you land walk along c₂v₂,
-        and so on. The dark arrow from the origin to the final stop is
-        <em>w</em>.
+        Each coefficient stretches its vector — negative values flip it through
+        the origin — and the terms are added nose to tail. The dashed path is
+        that addition happening one term at a time: start at the origin, walk
+        along c₁v₁, then from wherever you land walk along c₂v₂, and so on. The
+        dark arrow from the origin to the final stop is
+        <span class="sym">w</span>.
       </p>
       <p>
-        The order you walk in doesn't matter — vector addition commutes, so
-        rearranging the terms changes the dashed path but never the endpoint.
+        Reordering the terms changes the dashed path but never the endpoint —
+        that's the commutative law from the list above, showing up as a shape.
         Two vectors pointing in genuinely different directions can reach every
-        point in the plane between them; two that lie on a common line can only
-        ever reach that line, no matter what coefficients you choose. That
-        distinction is linear independence, and you can feel it by dragging one
-        vector until it lines up with another and watching the reachable set
-        collapse.
+        point in the plane; two lying along a common line can only ever reach
+        that line, whatever coefficients you pick. Drag one vector until it
+        lines up with another and watch the reachable set collapse. That is
+        linear dependence, and it's why a basis needs its vectors to point in
+        independent directions.
       </p>
     </section>
 

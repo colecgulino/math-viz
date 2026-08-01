@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 364 306" width="364" height="306" role="img" aria-label="w reached as three steps along i-hat then two along j-hat">
+  <rect x="0.5" y="0.5" width="363" height="305" rx="10" fill="#f6efe3" stroke="#d9c9ae" stroke-width="1"/>
+  <polyline points="28.0,6.0 28.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="68.0,6.0 68.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="108.0,6.0 108.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="148.0,6.0 148.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="188.0,6.0 188.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="228.0,6.0 228.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="268.0,6.0 268.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="308.0,6.0 308.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="348.0,6.0 348.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,262.0 358.0,262.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,222.0 358.0,222.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,182.0 358.0,182.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,142.0 358.0,142.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,102.0 358.0,102.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,62.0 358.0,62.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,22.0 358.0,22.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,222.0 358.0,222.0" fill="none" stroke="#9c8f7c" stroke-width="1.3" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="68.0,6.0 68.0,300.0" fill="none" stroke="#9c8f7c" stroke-width="1.3" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="68.0,222.0 188.0,222.0" fill="none" stroke="#bf5b2e" stroke-width="9.0" stroke-opacity="0.16" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="188.0,222.0 188.0,142.0" fill="none" stroke="#7d8447" stroke-width="9.0" stroke-opacity="0.16" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="68.0,222.0 177.0,222.0" fill="none" stroke="#bf5b2e" stroke-width="1.8" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5"/><path d="M188.0,222.0 L176.0,227.3 L176.0,216.7 Z" fill="#bf5b2e" fill-opacity="0.95"/>
+  <polyline points="188.0,222.0 188.0,153.0" fill="none" stroke="#7d8447" stroke-width="1.8" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5"/><path d="M188.0,142.0 L193.3,154.0 L182.7,154.0 Z" fill="#7d8447" fill-opacity="0.95"/>
+  <polyline points="68.0,222.0 98.0,222.0" fill="none" stroke="#bf5b2e" stroke-width="3.4" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M108.0,222.0 L97.0,226.8 L97.0,217.2 Z" fill="#bf5b2e" fill-opacity="1.0"/>
+  <polyline points="68.0,222.0 68.0,192.0" fill="none" stroke="#7d8447" stroke-width="3.4" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M68.0,182.0 L72.8,193.0 L63.2,193.0 Z" fill="#7d8447" fill-opacity="1.0"/>
+  <rect x="81.3" y="194.0" width="17.3" height="22.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="90.0" y="205.0" fill="#bf5b2e" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="16" text-anchor="middle" dominant-baseline="middle" font-style="italic">î</text>
+  <rect x="40.3" y="187.0" width="17.3" height="22.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="49.0" y="198.0" fill="#7d8447" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="16" text-anchor="middle" dominant-baseline="middle" font-style="italic">ĵ</text>
+  <rect x="134.1" y="231.0" width="23.9" height="18.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="146.0" y="240.0" fill="#bf5b2e" font-family="ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace" font-size="12" text-anchor="middle" dominant-baseline="middle">3î</text>
+  <rect x="198.1" y="173.0" width="23.9" height="18.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="210.0" y="182.0" fill="#7d8447" font-family="ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace" font-size="12" text-anchor="middle" dominant-baseline="middle">2ĵ</text>
+  <polyline points="68.0,222.0 178.0,148.7" fill="none" stroke="#2f2a25" stroke-width="3.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M188.0,142.0 L180.4,154.0 L174.0,144.5 Z" fill="#2f2a25" fill-opacity="1.0"/>
+  <rect x="199.1" y="118.5" width="17.8" height="23.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="208.0" y="130.0" fill="#2f2a25" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="17" text-anchor="middle" dominant-baseline="middle" font-style="italic">w</text>
+</svg>
