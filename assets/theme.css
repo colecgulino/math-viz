@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------------
+   math-viz shared theme
+   Warm earth-tone design tokens. Import this from every page so the
+   whole collection reads as one system.
+   --------------------------------------------------------------- */
+
+:root {
+  /* --- Surfaces: sand, warm and low-contrast --- */
+  --sand-100: #f6efe3;
+  --sand-200: #efe5d5;
+  --sand-300: #e6d9c4;
+  --sand-400: #d9c9ae;
+  --sand-500: #c9b593;
+
+  /* --- Ink: warm greys, never pure black --- */
+  --ink-900: #2f2a25;
+  --ink-700: #4e463e;
+  --ink-500: #6f665c;
+  --ink-400: #8a8074;
+  --ink-300: #a89d8e;
+
+  /* --- Accent: burnt orange / terracotta --- */
+  --clay-600: #a34a24;
+  --clay-500: #bf5b2e;
+  --clay-400: #d47342;
+  --clay-200: #eab99e;
+
+  /* --- Plot palette: warm tones for drawings & data ---
+     Ordered for categorical use; each is legible on sand. */
+  --plot-1: #bf5b2e; /* burnt orange  */
+  --plot-2: #8c6239; /* umber         */
+  --plot-3: #c99a2e; /* ochre         */
+  --plot-4: #7d8447; /* olive         */
+  --plot-5: #a8553f; /* brick         */
+  --plot-6: #5f7161; /* sage          */
+  --plot-7: #94643f; /* clay brown    */
+  --plot-8: #6b5b4a; /* driftwood     */
+
+  /* --- Semantic drawing roles --- */
+  --grid-line: #d6c6ac;
+  --axis-line: #9c8f7c;
+  --curve: var(--plot-1);
+  --curve-alt: var(--plot-4);
+
+  /* --- Type --- */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino,
+    "Book Antiqua", Georgia, serif;
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter,
+    Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  /* --- Layout --- */
+  --measure: 68ch;
+  --page-max: 1080px;
+  --radius: 10px;
+  --border: 1px solid var(--sand-400);
+  --shadow-soft: 0 1px 2px rgba(80, 60, 40, 0.05),
+    0 8px 24px rgba(80, 60, 40, 0.06);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--sand-200);
+  color: var(--ink-700);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--ink-900);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+a {
+  color: var(--clay-600);
+  text-decoration-color: var(--clay-200);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-color: var(--clay-500);
+}
+
+code,
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* Respect users who ask for stillness. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

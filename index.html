@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>math-viz — visual explanations of mathematical ideas</title>
+    <meta
+      name="description"
+      content="A small collection of interactive visualizations of mathematical concepts."
+    />
+    <link rel="stylesheet" href="assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* ---- masthead ---- */
+      /* Use padding-block throughout: these elements are also .page, and a
+         padding shorthand here would wipe out its horizontal gutter. */
+      .masthead {
+        padding-block: 92px 44px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--clay-600);
+        margin: 0 0 20px;
+      }
+      .masthead h1 {
+        font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+        max-width: 16ch;
+      }
+      .lede {
+        max-width: 54ch;
+        margin: 22px 0 0;
+        font-size: 1.1rem;
+        color: var(--ink-500);
+      }
+
+      .rule {
+        border: 0;
+        border-top: var(--border);
+        margin: 0;
+      }
+
+      /* ---- index ---- */
+      .index {
+        padding-block: 44px 96px;
+      }
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+      .section-head h2 {
+        font-size: 1.3rem;
+      }
+      .count {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--ink-400);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+        gap: 22px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 140ms ease, box-shadow 140ms ease;
+      }
+      a.card:hover {
+        border-color: var(--clay-400);
+        box-shadow: var(--shadow-soft);
+      }
+      a.card:focus-visible {
+        outline: 2px solid var(--clay-500);
+        outline-offset: 3px;
+      }
+
+      .card img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-bottom: var(--border);
+      }
+      .card-body {
+        padding: 18px 20px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        flex: 1;
+      }
+      .card h3 {
+        font-size: 1.12rem;
+      }
+      .card p {
+        margin: 0;
+        font-size: 0.94rem;
+        color: var(--ink-500);
+        line-height: 1.55;
+      }
+      .tags {
+        margin-top: auto;
+        padding-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tag {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-400);
+        border: 1px solid var(--sand-400);
+        border-radius: 999px;
+        padding: 3px 9px;
+      }
+      .tag--live {
+        color: var(--clay-600);
+        border-color: var(--clay-200);
+        background: rgba(191, 91, 46, 0.06);
+      }
+
+      /* Planned entries: same shape, deliberately quieter, not clickable. */
+      .card--planned {
+        background: transparent;
+        border-style: dashed;
+      }
+      .card--planned img {
+        opacity: 0.5;
+        filter: saturate(0.7);
+      }
+      .card--planned h3 {
+        color: var(--ink-500);
+      }
+      .card--planned p {
+        color: var(--ink-400);
+      }
+
+      /* ---- footer ---- */
+      .foot {
+        border-top: var(--border);
+        padding-block: 26px 60px;
+        font-size: 0.88rem;
+        color: var(--ink-400);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+        justify-content: space-between;
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          padding: 0 20px;
+        }
+        .masthead {
+          padding-block: 60px 34px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="masthead page">
+      <p class="eyebrow">math&#8202;·&#8202;viz</p>
+      <h1>Visual explanations of mathematical ideas.</h1>
+      <p class="lede">
+        A growing collection of small, self-contained pages. Each one takes a
+        single concept and draws it — no prerequisites beyond curiosity, no
+        libraries, no tracking.
+      </p>
+    </header>
+
+    <hr class="rule" />
+
+    <main class="index page">
+      <div class="section-head">
+        <h2>Index</h2>
+        <span class="count">1 published · 5 planned</span>
+      </div>
+
+      <ul class="grid">
+        <li>
+          <a class="card" href="lissajous/">
+            <img
+              src="assets/thumbs/lissajous.svg"
+              alt="Two interlocking Lissajous curves"
+              width="320"
+              height="160"
+            />
+            <div class="card-body">
+              <h3>Lissajous Curves</h3>
+              <p>
+                What happens when two perpendicular oscillations meet. Rational
+                frequency ratios close into knots; irrational ones never repeat.
+              </p>
+              <div class="tags">
+                <span class="tag tag--live">Live</span>
+                <span class="tag">Parametric</span>
+              </div>
+            </div>
+          </a>
+        </li>
+
+        <li>
+          <div class="card card--planned">
+            <img
+              src="assets/thumbs/fourier.svg"
+              alt="A square wave approximated by sine harmonics"
+              width="320"
+              height="160"
+            />
+            <div class="card-body">
+              <h3>Fourier Series</h3>
+              <p>
+                Building a square wave out of nothing but sines, and watching
+                Gibbs' overshoot refuse to go away.
+              </p>
+              <div class="tags"><span class="tag">Planned</span></div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="card card--planned">
+            <img
+              src="assets/thumbs/eigen.svg"
+              alt="A grid under a linear map with eigenvector directions marked"
+              width="320"
+              height="160"
+            />
+            <div class="card-body">
+              <h3>Eigenvectors</h3>
+              <p>
+                The directions a linear map leaves alone. Drag the matrix and
+                watch the invariant axes move.
+              </p>
+              <div class="tags"><span class="tag">Planned</span></div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="card card--planned">
+            <img
+              src="assets/thumbs/taylor.svg"
+              alt="Sine curve with successive polynomial approximations"
+              width="320"
+              height="160"
+            />
+            <div class="card-body">
+              <h3>Taylor Approximations</h3>
+              <p>
+                Each added term buys a little more accuracy, and only near the
+                point you expanded around.
+              </p>
+              <div class="tags"><span class="tag">Planned</span></div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="card card--planned">
+            <img
+              src="assets/thumbs/conformal.svg"
+              alt="A Cartesian grid warped by a complex map"
+              width="320"
+              height="160"
+            />
+            <div class="card-body">
+              <h3>Conformal Maps</h3>
+              <p>
+                Complex functions as distortions of the plane — bending every
+                line while preserving every angle.
+              </p>
+              <div class="tags"><span class="tag">Planned</span></div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="card card--planned">
+            <img
+              src="assets/thumbs/randomwalk.svg"
+              alt="Three random walks diverging from a zero line"
+              width="320"
+              height="160"
+            />
+            <div class="card-body">
+              <h3>Random Walks</h3>
+              <p>
+                Individually unpredictable, collectively lawful. Where the
+                square-root-of-time scaling comes from.
+              </p>
+              <div class="tags"><span class="tag">Planned</span></div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </main>
+
+    <footer class="foot page">
+      <span>Built with plain HTML, CSS and SVG.</span>
+      <span><a href="https://github.com/colecgulino/math-viz">Source on GitHub</a></span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lissajous Curves — math-viz</title>
+    <meta
+      name="description"
+      content="An interactive look at what happens when two perpendicular oscillations meet."
+    />
+    <link rel="stylesheet" href="../assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* Use padding-block throughout: these elements are also .page, and a
+         padding shorthand here would wipe out its horizontal gutter. */
+      .topbar {
+        padding-block: 26px;
+        font-size: 0.88rem;
+      }
+      .topbar a {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .topbar a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      header.intro {
+        padding-block: 8px 36px;
+      }
+      header.intro h1 {
+        font-size: clamp(2rem, 4.5vw, 2.8rem);
+      }
+      header.intro p {
+        max-width: var(--measure);
+        color: var(--ink-500);
+        margin: 18px 0 0;
+      }
+
+      .stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 268px;
+        gap: 28px;
+        align-items: start;
+        padding-bottom: 40px;
+      }
+
+      .plate {
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+      }
+      .plate svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .panel {
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+      }
+      .panel h2 {
+        font-size: 0.78rem;
+        font-family: var(--font-mono);
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-400);
+        margin-bottom: 18px;
+      }
+
+      .control {
+        margin-bottom: 20px;
+      }
+      .control-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 7px;
+      }
+      .control label {
+        font-size: 0.92rem;
+        color: var(--ink-700);
+      }
+      .control output {
+        font-family: var(--font-mono);
+        font-size: 0.86rem;
+        color: var(--clay-600);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 22px;
+        background: transparent;
+        cursor: pointer;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 3px;
+        border-radius: 2px;
+        background: var(--sand-400);
+      }
+      input[type="range"]::-moz-range-track {
+        height: 3px;
+        border-radius: 2px;
+        background: var(--sand-400);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        margin-top: -6px;
+        border-radius: 50%;
+        background: var(--clay-500);
+        border: 2px solid var(--sand-100);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        border: 2px solid var(--sand-100);
+        border-radius: 50%;
+        background: var(--clay-500);
+      }
+      input[type="range"]:focus-visible {
+        outline: 2px solid var(--clay-500);
+        outline-offset: 4px;
+        border-radius: 4px;
+      }
+
+      .presets {
+        border-top: var(--border);
+        padding-top: 16px;
+      }
+      .preset-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .preset-buttons button {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--ink-500);
+        background: transparent;
+        border: 1px solid var(--sand-400);
+        border-radius: 999px;
+        padding: 4px 11px;
+        cursor: pointer;
+        transition: border-color 120ms ease, color 120ms ease;
+      }
+      .preset-buttons button:hover {
+        border-color: var(--clay-400);
+        color: var(--clay-600);
+      }
+
+      .readout {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        border-top: var(--border);
+        margin-top: 16px;
+        padding-top: 14px;
+        line-height: 1.7;
+      }
+      .readout b {
+        color: var(--ink-700);
+        font-weight: 500;
+      }
+
+      .notes {
+        max-width: var(--measure);
+        border-top: var(--border);
+        padding-block: 34px 90px;
+      }
+      .notes h2 {
+        font-size: 1.2rem;
+        margin-bottom: 14px;
+      }
+      .notes p {
+        margin: 0 0 15px;
+      }
+      .notes .eq {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        margin: 0 0 18px;
+      }
+
+      @media (max-width: 780px) {
+        .stage {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 640px) {
+        .page {
+          padding: 0 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topbar page"><a href="../">&larr; Index</a></nav>
+
+    <header class="intro page">
+      <h1>Lissajous Curves</h1>
+      <p>
+        Take two oscillations at right angles to one another — one driving
+        horizontal motion, one vertical — and trace the point where they meet.
+        The shape that appears depends almost entirely on the ratio between
+        their frequencies.
+      </p>
+    </header>
+
+    <div class="stage page">
+      <div class="plate">
+        <svg id="plot" viewBox="0 0 560 460" aria-label="Lissajous curve plot">
+          <g id="frame" stroke="var(--grid-line)" stroke-width="1">
+            <line x1="40" y1="230" x2="520" y2="230" stroke="var(--axis-line)" />
+            <line x1="280" y1="20" x2="280" y2="440" stroke="var(--axis-line)" />
+          </g>
+          <path
+            id="curve"
+            fill="none"
+            stroke="var(--curve)"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <div class="panel">
+        <h2>Parameters</h2>
+
+        <div class="control">
+          <div class="control-row">
+            <label for="a">Horizontal frequency &nbsp;<i>a</i></label>
+            <output id="a-out">3</output>
+          </div>
+          <input id="a" type="range" min="1" max="9" step="1" value="3" />
+        </div>
+
+        <div class="control">
+          <div class="control-row">
+            <label for="b">Vertical frequency &nbsp;<i>b</i></label>
+            <output id="b-out">4</output>
+          </div>
+          <input id="b" type="range" min="1" max="9" step="1" value="4" />
+        </div>
+
+        <div class="control">
+          <div class="control-row">
+            <label for="p">Phase &nbsp;<i>&delta;</i></label>
+            <output id="p-out">0.50&pi;</output>
+          </div>
+          <input id="p" type="range" min="0" max="100" step="1" value="50" />
+        </div>
+
+        <div class="presets">
+          <div class="preset-buttons">
+            <button type="button" data-preset="1,1,50">1:1</button>
+            <button type="button" data-preset="1,2,50">1:2</button>
+            <button type="button" data-preset="3,2,50">3:2</button>
+            <button type="button" data-preset="3,4,50">3:4</button>
+            <button type="button" data-preset="5,4,50">5:4</button>
+            <button type="button" data-preset="9,8,50">9:8</button>
+          </div>
+          <div class="readout">
+            ratio &nbsp;<b id="ratio">3 : 4</b><br />
+            period &nbsp;t = <b id="period">2π</b><br />
+            edges &nbsp;<b id="lobes">3 × 4</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="notes page">
+      <h2>What you're looking at</h2>
+      <p class="eq">x(t) = sin(a·t + &delta;)&nbsp;&nbsp;&nbsp;y(t) = sin(b·t)</p>
+      <p>
+        Both coordinates are periodic, so the curve closes the moment they
+        return to their starting values together — at
+        <i>t</i>&nbsp;=&nbsp;2&pi;/gcd(<i>a</i>,<i>b</i>). Only the reduced
+        ratio matters: 4:6 draws exactly the same figure as 2:3, just twice as
+        quickly. Along the way the curve touches the left and right edges of
+        its box <i>a</i>/gcd times and the top and bottom <i>b</i>/gcd times,
+        which is the quickest way to read a ratio straight off a picture.
+      </p>
+      <p>
+        The phase <i>&delta;</i> doesn't change that structure, only how the
+        figure is tilted and folded. At <i>&delta;</i> = 0 the curve degenerates
+        into a single doubled-back arc; a quarter turn later it opens into its
+        widest form. Sweep the slider and watch a 1:1 curve pass from a diagonal
+        line, through an ellipse, to a circle, and back.
+      </p>
+      <p>
+        Set an irrational ratio and the curve would never close at all — it
+        would fill the square densely, forever. The sliders here are restricted
+        to whole numbers, so every figure you can draw eventually comes home.
+      </p>
+    </section>
+
+    <script>
+      (function () {
+        const $ = (id) => document.getElementById(id);
+        const curve = $("curve");
+        const aEl = $("a"), bEl = $("b"), pEl = $("p");
+
+        const gcd = (m, n) => (n ? gcd(n, m % n) : m);
+
+        function draw() {
+          const a = +aEl.value;
+          const b = +bEl.value;
+          const delta = (+pEl.value / 100) * Math.PI;
+
+          const cx = 280, cy = 230, rx = 232, ry = 200;
+          // Both coordinates return to their start at t = 2*pi/gcd(a,b);
+          // that is exactly one traversal of the closed figure.
+          const g = gcd(a, b);
+          const span = (2 * Math.PI) / g;
+          const steps = Math.max(400, (200 * Math.max(a, b)) / g);
+
+          let d = "";
+          for (let i = 0; i <= steps; i++) {
+            const t = (span * i) / steps;
+            const x = cx + rx * Math.sin(a * t + delta);
+            const y = cy - ry * Math.sin(b * t);
+            d += (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
+          }
+          curve.setAttribute("d", d);
+
+          $("a-out").textContent = a;
+          $("b-out").textContent = b;
+          $("p-out").textContent = (+pEl.value / 100).toFixed(2) + "π";
+          $("ratio").textContent = a / g + " : " + b / g;
+          $("period").textContent =
+            g === 1 ? "2π" : g === 2 ? "π" : "2π/" + g;
+          $("lobes").textContent = a / g + " × " + b / g;
+        }
+
+        [aEl, bEl, pEl].forEach((el) => el.addEventListener("input", draw));
+
+        document.querySelectorAll("[data-preset]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const [a, b, p] = btn.dataset.preset.split(",");
+            aEl.value = a;
+            bEl.value = b;
+            pEl.value = p;
+            draw();
+          });
+        });
+
+        draw();
+      })();
+    </script>
+  </body>
+</html>
