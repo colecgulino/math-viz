@@ -49,12 +49,17 @@
       .index {
         padding-block: 44px 96px;
       }
+      .topic + .topic {
+        margin-top: 52px;
+      }
       .section-head {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: 16px;
-        margin-bottom: 28px;
+        margin-bottom: 22px;
+        padding-bottom: 12px;
+        border-bottom: var(--border);
       }
       .section-head h2 {
         font-size: 1.3rem;
@@ -195,129 +200,37 @@
     <hr class="rule" />
 
     <main class="index page">
-      <div class="section-head">
-        <h2>Index</h2>
-        <span class="count">1 published · 5 planned</span>
-      </div>
+      <section class="topic">
+        <div class="section-head">
+          <h2>Linear Algebra</h2>
+          <span class="count">1 page</span>
+        </div>
 
-      <ul class="grid">
-        <li>
-          <a class="card" href="lissajous/">
-            <img
-              src="assets/thumbs/lissajous.svg"
-              alt="Two interlocking Lissajous curves"
-              width="320"
-              height="160"
-            />
-            <div class="card-body">
-              <h3>Lissajous Curves</h3>
-              <p>
-                What happens when two perpendicular oscillations meet. Rational
-                frequency ratios close into knots; irrational ones never repeat.
-              </p>
-              <div class="tags">
-                <span class="tag tag--live">Live</span>
-                <span class="tag">Parametric</span>
+        <ul class="grid">
+          <li>
+            <a class="card" href="linear-algebra/linear-combinations/">
+              <img
+                src="assets/thumbs/lincomb.svg"
+                alt="Two vectors on a grid combined tip to tail into a third"
+                width="320"
+                height="160"
+              />
+              <div class="card-body">
+                <h3>Linear Combinations</h3>
+                <p>
+                  Build vectors on a grid, scale them, and add them together.
+                  The result is drawn tip to tail so you can see where it comes
+                  from.
+                </p>
+                <div class="tags">
+                  <span class="tag tag--live">Live</span>
+                  <span class="tag">Interactive</span>
+                </div>
               </div>
-            </div>
-          </a>
-        </li>
-
-        <li>
-          <div class="card card--planned">
-            <img
-              src="assets/thumbs/fourier.svg"
-              alt="A square wave approximated by sine harmonics"
-              width="320"
-              height="160"
-            />
-            <div class="card-body">
-              <h3>Fourier Series</h3>
-              <p>
-                Building a square wave out of nothing but sines, and watching
-                Gibbs' overshoot refuse to go away.
-              </p>
-              <div class="tags"><span class="tag">Planned</span></div>
-            </div>
-          </div>
-        </li>
-
-        <li>
-          <div class="card card--planned">
-            <img
-              src="assets/thumbs/eigen.svg"
-              alt="A grid under a linear map with eigenvector directions marked"
-              width="320"
-              height="160"
-            />
-            <div class="card-body">
-              <h3>Eigenvectors</h3>
-              <p>
-                The directions a linear map leaves alone. Drag the matrix and
-                watch the invariant axes move.
-              </p>
-              <div class="tags"><span class="tag">Planned</span></div>
-            </div>
-          </div>
-        </li>
-
-        <li>
-          <div class="card card--planned">
-            <img
-              src="assets/thumbs/taylor.svg"
-              alt="Sine curve with successive polynomial approximations"
-              width="320"
-              height="160"
-            />
-            <div class="card-body">
-              <h3>Taylor Approximations</h3>
-              <p>
-                Each added term buys a little more accuracy, and only near the
-                point you expanded around.
-              </p>
-              <div class="tags"><span class="tag">Planned</span></div>
-            </div>
-          </div>
-        </li>
-
-        <li>
-          <div class="card card--planned">
-            <img
-              src="assets/thumbs/conformal.svg"
-              alt="A Cartesian grid warped by a complex map"
-              width="320"
-              height="160"
-            />
-            <div class="card-body">
-              <h3>Conformal Maps</h3>
-              <p>
-                Complex functions as distortions of the plane — bending every
-                line while preserving every angle.
-              </p>
-              <div class="tags"><span class="tag">Planned</span></div>
-            </div>
-          </div>
-        </li>
-
-        <li>
-          <div class="card card--planned">
-            <img
-              src="assets/thumbs/randomwalk.svg"
-              alt="Three random walks diverging from a zero line"
-              width="320"
-              height="160"
-            />
-            <div class="card-body">
-              <h3>Random Walks</h3>
-              <p>
-                Individually unpredictable, collectively lawful. Where the
-                square-root-of-time scaling comes from.
-              </p>
-              <div class="tags"><span class="tag">Planned</span></div>
-            </div>
-          </div>
-        </li>
-      </ul>
+            </a>
+          </li>
+        </ul>
+      </section>
     </main>
 
     <footer class="foot page">

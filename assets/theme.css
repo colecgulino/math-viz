@@ -113,6 +113,211 @@ kbd {
   padding: 0 28px;
 }
 
+/* ---------------------------------------------------------------
+   Shared page furniture
+   Anything that is also .page must set padding-block, never the
+   padding shorthand, or it wipes out the horizontal gutter above.
+   --------------------------------------------------------------- */
+
+.topbar {
+  padding-block: 26px;
+}
+.topbar a {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.topbar a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.intro {
+  padding-block: 8px 34px;
+}
+.intro h1 {
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+}
+.intro p {
+  max-width: var(--measure);
+  color: var(--ink-500);
+  margin: 18px 0 0;
+}
+
+/* Board on the left, controls on the right. */
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 316px;
+  gap: 26px;
+  align-items: start;
+  padding-bottom: 40px;
+}
+
+/* An inset drawing surface. */
+.plate {
+  background: var(--sand-100);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.plate svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel {
+  background: var(--sand-100);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.panel h2 {
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 14px;
+}
+
+/* --- form controls --- */
+input[type="number"],
+input[type="text"] {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-900);
+  background: var(--sand-200);
+  border: 1px solid var(--sand-400);
+  border-radius: 6px;
+  padding: 4px 7px;
+  width: 100%;
+  min-width: 0;
+}
+input[type="number"]:focus-visible,
+input[type="text"]:focus-visible {
+  outline: 2px solid var(--clay-500);
+  outline-offset: 1px;
+}
+/* Spinners eat width in narrow fields; arrow keys still step. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sand-400);
+}
+input[type="range"]::-moz-range-track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sand-400);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5.5px;
+  border-radius: 50%;
+  background: var(--clay-500);
+  border: 2px solid var(--sand-100);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--sand-100);
+  border-radius: 50%;
+  background: var(--clay-500);
+}
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--clay-500);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.btn {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-500);
+  background: transparent;
+  border: 1px solid var(--sand-400);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--clay-400);
+  color: var(--clay-600);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--clay-500);
+  outline-offset: 2px;
+}
+
+/* Prose section beneath a figure. */
+.notes {
+  max-width: var(--measure);
+  border-top: var(--border);
+  padding-block: 32px 90px;
+}
+.notes h2 {
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+.notes p {
+  margin: 0 0 15px;
+}
+.notes .eq {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background: var(--sand-100);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 0 0 18px;
+}
+
+@media (max-width: 860px) {
+  .stage {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .page {
+    padding: 0 20px;
+  }
+}
+
 /* Respect users who ask for stillness. */
 @media (prefers-reduced-motion: reduce) {
   *,
