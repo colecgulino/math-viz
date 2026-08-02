@@ -40,9 +40,15 @@ See `warmColor()` in the linear-combinations page for the approach: walk an
 ordered hue ring so consecutive picks stay distinguishable, and run the olive
 end at much lower saturation than the reds.
 
-**Gotcha:** anything that is also `.page` must use `padding-block`, never the
-`padding` shorthand — the shorthand silently drops `.page`'s horizontal gutter
-and the content ends up flush against the screen edge on narrow viewports.
+**Two gotchas, both from elements that are also `.page`:**
+
+- Use `padding-block`, never the `padding` shorthand — the shorthand silently
+  drops `.page`'s horizontal gutter and the content ends up flush against the
+  screen edge on narrow viewports.
+- Don't set `max-width` on the element either. `.page` centres with
+  `margin: 0 auto`, so a narrower `max-width` centres the whole block instead
+  of leaving it aligned with the rest of the page. Put the measure on the
+  children (`.notes > *`) so the text wraps but the section still lines up.
 
 ## Adding a visualization
 

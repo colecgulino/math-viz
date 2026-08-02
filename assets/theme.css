@@ -284,11 +284,15 @@ input[type="range"]:focus-visible {
   outline-offset: 2px;
 }
 
-/* Prose section beneath a figure. */
+/* Prose section beneath a figure. The measure goes on the children, not on
+   .notes itself — .notes is also .page, whose `margin: 0 auto` would centre
+   the whole block instead of leaving it aligned with the rest of the page. */
 .notes {
-  max-width: var(--measure);
   border-top: var(--border);
   padding-block: 32px 90px;
+}
+.notes > * {
+  max-width: var(--measure);
 }
 .notes h2 {
   font-size: 1.2rem;

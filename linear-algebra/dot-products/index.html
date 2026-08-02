@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dot Products — math-viz</title>
+    <meta
+      name="description"
+      content="What the dot product measures: one vector's shadow on another, scaled by that other's length."
+    />
+    <link rel="stylesheet" href="../../assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* ---- explainer prose ---- */
+      .jump {
+        display: inline-block;
+        margin-top: 18px;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .jump:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .explainer {
+        padding-block: 10px 6px;
+      }
+      .explainer > section + section {
+        margin-top: 46px;
+      }
+      .explainer h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+      }
+      .explainer p {
+        max-width: var(--measure);
+        margin: 0 0 17px;
+      }
+      .explainer figure {
+        margin: 26px 0 28px;
+        max-width: 800px;
+      }
+      .explainer figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .two-up {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+      }
+      .two-up figcaption {
+        grid-column: 1 / -1;
+      }
+      .fig-cap {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-500);
+        text-align: center;
+        margin: 12px 0 0 !important;
+      }
+      .explainer figcaption {
+        max-width: var(--measure);
+        margin-top: 14px;
+        font-size: 0.86rem;
+        color: var(--ink-400);
+      }
+      @media (max-width: 660px) {
+        .two-up {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+      }
+
+      .sym {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-900);
+      }
+
+      /* A displayed calculation, in the prose column. */
+      .calc {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        line-height: 1.9;
+        color: var(--ink-900);
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        max-width: var(--measure);
+        overflow-x: auto;
+      }
+      .calc .muted {
+        color: var(--ink-400);
+      }
+
+      /* ---- board ---- */
+      .board-wrap {
+        position: relative;
+      }
+      #board {
+        touch-action: none;
+      }
+      #grid line {
+        stroke: var(--grid-line);
+        stroke-width: 1;
+      }
+      #axes .axis {
+        stroke: var(--axis-line);
+        stroke-width: 1.4;
+      }
+      .tick {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+      }
+      .vlabel {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 16px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+      }
+      .anglelabel {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+        fill: var(--ink-500);
+      }
+      .handle {
+        fill: transparent;
+        cursor: grab;
+      }
+      .handle:active {
+        cursor: grabbing;
+      }
+      .handle-ring {
+        fill: none;
+        stroke-width: 1.5;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 110ms ease;
+      }
+      .handle:hover + .handle-ring,
+      .handle:focus-visible + .handle-ring {
+        opacity: 0.55;
+      }
+      .hint {
+        position: absolute;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        margin: 0;
+        font-size: 0.84rem;
+        color: var(--ink-400);
+        background: rgba(246, 239, 227, 0.92);
+        border: var(--border);
+        border-radius: 999px;
+        padding: 5px 15px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .hint[hidden] {
+        display: none;
+      }
+
+      /* ---- panels ---- */
+      .vrow {
+        display: grid;
+        grid-template-columns: 12px 24px 1fr 1fr;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .swatch {
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+      }
+      .vname {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--ink-900);
+      }
+
+      .sum {
+        font-family: var(--font-mono);
+        font-size: 0.86rem;
+        line-height: 1.85;
+        color: var(--ink-500);
+        margin: 0 0 14px;
+      }
+      .sum b {
+        color: var(--ink-900);
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        border-top: var(--border);
+        padding-top: 13px;
+        margin-bottom: 14px;
+      }
+      .stats span:nth-child(even) {
+        color: var(--ink-900);
+        text-align: right;
+      }
+
+      /* The three lines that spell out shadow x length = dot product. */
+      .chainsum {
+        border-top: var(--border);
+        padding-top: 13px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+        align-items: baseline;
+      }
+      .chainsum .lbl {
+        color: var(--ink-400);
+      }
+      .chainsum .val {
+        text-align: right;
+        color: var(--ink-900);
+      }
+      .chainsum .total {
+        border-top: 1px solid var(--sand-400);
+        padding-top: 6px;
+        margin-top: 2px;
+      }
+      .chainsum .total.val {
+        font-size: 0.95rem;
+      }
+
+      .badge {
+        display: inline-block;
+        margin-top: 12px;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--clay-600);
+        border: 1px solid var(--clay-200);
+        background: rgba(191, 91, 46, 0.06);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .badge[hidden] {
+        display: none;
+      }
+
+      .toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 13px;
+        font-size: 0.86rem;
+        color: var(--ink-500);
+        cursor: pointer;
+      }
+      .toggle input {
+        accent-color: var(--clay-500);
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        flex: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topbar page"><a href="../../">&larr; Index</a></nav>
+
+    <header class="intro page">
+      <h1>Dot Products</h1>
+      <p>
+        Two vectors go in, a single number comes out. That number answers a
+        specific question: how much of one vector points along the other? It
+        turns out to be the cheapest useful thing you can compute about a pair
+        of vectors, which is why it shows up everywhere from lighting models to
+        search engines.
+      </p>
+      <a class="jump" href="#board-section">Skip to the board &darr;</a>
+    </header>
+
+    <div class="explainer page">
+      <section>
+        <h2>Multiply matching components, then add</h2>
+        <p>
+          The recipe is almost too simple. Pair up the components, multiply each
+          pair, add the results:
+        </p>
+        <div class="calc">
+          a · b &nbsp;=&nbsp; a₁b₁ + a₂b₂<br />
+          <span class="muted">(2, 3) · (5, 1)</span> &nbsp;=&nbsp; 2·5 + 3·1
+          &nbsp;=&nbsp; 13
+        </div>
+        <p>
+          Nothing about that suggests geometry, yet the answer is deeply
+          geometric. Drop a perpendicular from the tip of
+          <span class="sym">a</span> onto the line through
+          <span class="sym">b</span>. Where it lands marks
+          <span class="sym">p</span>, the shadow <span class="sym">a</span>
+          casts on <span class="sym">b</span> — and the length of that shadow,
+          multiplied by the length of <span class="sym">b</span>, is exactly the
+          number the arithmetic gave you.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/dot-projection.svg"
+              alt="Vector a with a perpendicular dropped onto the line through b, marking the shadow p."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">a · b = |p| |b|</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/dot-perpendicular.svg"
+              alt="Two perpendicular vectors, where the shadow collapses to a single point at the origin."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">a · b = 0</p>
+          </div>
+          <figcaption>
+            The shadow shrinks as the vectors swing apart, and vanishes when
+            they meet at a right angle.
+          </figcaption>
+        </figure>
+
+        <p>
+          That gives the second formula, the one that makes the geometry
+          explicit. If <span class="sym">θ</span> is the angle between them, the
+          shadow has length |a| cos θ, so:
+        </p>
+        <div class="calc">a · b &nbsp;=&nbsp; |a| |b| cos θ</div>
+        <p>
+          Read that as a similarity score. When the vectors point the same way,
+          cos θ = 1 and the product is as large as it can be. Swing them apart
+          and it shrinks. At exactly 90° the cosine is zero, the shadow
+          collapses to a point, and so does the dot product — which is why
+          <strong>a · b = 0 is the test for perpendicular</strong>, and why it's
+          usually easier to check two vectors are at right angles by multiplying
+          and adding than by measuring any angle. Push past 90° and the shadow
+          falls on the far side of the origin, the cosine goes negative, and so
+          does the product: the vectors now disagree.
+        </p>
+        <p>
+          Both formulas describe the same number, which is a genuinely useful
+          fact — one side is trivial to compute, the other is easy to reason
+          about. Setting them equal is how you get the angle between two
+          vectors in the first place.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="board-section">
+      <div class="plate">
+        <div class="board-wrap">
+          <svg
+            id="board"
+            viewBox="0 0 704 528"
+            aria-label="Two vectors with the projection of one onto the other"
+          >
+            <g id="grid"></g>
+            <g id="axes"></g>
+            <g id="guide"></g>
+            <g id="proj"></g>
+            <g id="vectors"></g>
+            <g id="handles"></g>
+          </svg>
+          <p class="hint" id="hint">Drag either arrowhead.</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>Vectors</h2>
+          <div class="vrow">
+            <span class="swatch" style="background: var(--clay-500)"></span>
+            <span class="vname">a</span>
+            <input id="ax" type="number" step="1" value="2" aria-label="a x component" />
+            <input id="ay" type="number" step="1" value="3" aria-label="a y component" />
+          </div>
+          <div class="vrow" style="margin-bottom: 0">
+            <span class="swatch" style="background: #5f7161"></span>
+            <span class="vname">b</span>
+            <input id="bx" type="number" step="1" value="5" aria-label="b x component" />
+            <input id="by" type="number" step="1" value="1" aria-label="b y component" />
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Dot product</h2>
+          <p class="sum" id="sum"></p>
+
+          <div class="stats">
+            <span>|a|</span><span id="alen"></span>
+            <span>|b|</span><span id="blen"></span>
+            <span>angle θ</span><span id="theta"></span>
+          </div>
+
+          <div class="chainsum">
+            <span class="lbl" id="shadow-label">shadow of a on b</span>
+            <span class="val" id="shadow"></span>
+            <span class="lbl" id="times-label">× |b|</span>
+            <span class="val" id="times"></span>
+            <span class="lbl total" id="eq-label">= a · b</span>
+            <span class="val total" id="eq"></span>
+          </div>
+
+          <span class="badge" id="perp" hidden>Perpendicular</span>
+
+          <label class="toggle">
+            <input type="checkbox" id="swap" />
+            Project b onto a instead
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="show-proj" checked />
+            Show the construction
+          </label>
+        </section>
+      </aside>
+    </div>
+
+    <div class="explainer page">
+      <section>
+        <h2>A vector dotted with itself gives its length</h2>
+        <p>
+          Try the board with both vectors on top of each other, or just follow
+          the formula. The angle between <span class="sym">v</span> and itself
+          is zero, cos 0 = 1, and both lengths are the same, so
+          <span class="sym">v</span> · <span class="sym">v</span> = |v|². The
+          component recipe says the same thing without mentioning angles at all:
+        </p>
+        <div class="calc">
+          v · v &nbsp;=&nbsp; v₁v₁ + v₂v₂ &nbsp;=&nbsp; v₁² + v₂²
+        </div>
+        <p>
+          Which is Pythagoras. Drop the components of
+          <span class="sym">v</span> as the two legs of a right triangle and the
+          vector itself is the hypotenuse; the theorem says the square built on
+          the hypotenuse equals the two squares built on the legs.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/length-pythagoras.svg"
+              alt="The vector (3, 4) as the hypotenuse of a right triangle with legs 3 and 4."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">|v|² = 3² + 4²</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/length-squares.svg"
+              alt="Squares built on the two components of v, with areas 9 and 16."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">v · v = 9 + 16 = 25</p>
+          </div>
+          <figcaption>
+            The dot product of a vector with itself is the area of those two
+            squares added together.
+          </figcaption>
+        </figure>
+
+        <p>
+          So <span class="sym">v</span> · <span class="sym">v</span> is the
+          squared length, and taking a square root undoes it:
+        </p>
+        <div class="calc">
+          |v| &nbsp;=&nbsp; √(v · v) &nbsp;=&nbsp; √(v₁² + v₂²)<br />
+          <span class="muted">|(3, 4)|</span> &nbsp;=&nbsp; √(9 + 16)
+          &nbsp;=&nbsp; √25 &nbsp;=&nbsp; 5
+        </div>
+        <p>
+          This is more than a shortcut. Pythagoras is stated about triangles in
+          a plane, but √(v · v) never mentions triangles, or planes, or even
+          dimensions — it is written purely in terms of the dot product. Feed it
+          a vector with a hundred components and it still returns a length. That
+          is how distance gets carried into spaces you cannot draw: define a dot
+          product, and length, angle, and perpendicularity all follow from it
+          for free.
+        </p>
+      </section>
+    </div>
+
+    <section class="notes page">
+      <h2>Reading the board</h2>
+      <p>
+        The thick ochre arrow is the shadow — the part of
+        <span class="sym">a</span> that lies along
+        <span class="sym">b</span>. The dashed line drops from the tip of
+        <span class="sym">a</span> at a right angle to
+        <span class="sym">b</span>'s line, and the faint line extends that line
+        across the board so you can see where the shadow would fall even when it
+        lands past the end of <span class="sym">b</span>.
+      </p>
+      <p>
+        Swing <span class="sym">a</span> around and watch the shadow stretch,
+        shrink, vanish, and reappear pointing backwards. Two moments are worth
+        pausing on: when the shadow disappears the dot product reads zero and
+        the vectors are perpendicular; when it points opposite to
+        <span class="sym">b</span> the product is negative. Swapping which
+        vector gets projected changes the shadow entirely — but the two lengths
+        it gets multiplied by change to compensate, and the product lands on the
+        same number. That is a · b = b · a, visible as a construction.
+      </p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const U = 44, OX = 352, OY = 264;
+        const XMIN = -8, XMAX = 8, YMIN = -6, YMAX = 6;
+        const A_COLOR = "#bf5b2e", B_COLOR = "#5f7161", P_COLOR = "#c99a2e";
+
+        const sx = (x) => OX + U * x;
+        const sy = (y) => OY - U * y;
+        const lx = (x) => Math.max(14, Math.min(690, x));
+        const ly = (y) => Math.max(13, Math.min(517, y));
+        const $ = (id) => document.getElementById(id);
+        const board = $("board");
+
+        const vec = { a: { x: 2, y: 3 }, b: { x: 5, y: 1 } };
+
+        // Always pad to a fixed width — these are read as a column, and
+        // mixing "4" with "5.099" makes the arithmetic hard to follow.
+        const fmt = (n, d) => (n === 0 ? (0).toFixed(d) : n.toFixed(d));
+
+        function arrow(x1, y1, x2, y2, color, w, opts) {
+          const o = opts || {};
+          const dx = x2 - x1, dy = y2 - y1;
+          const len = Math.hypot(dx, dy);
+          if (len < 1) return "";
+          const ux = dx / len, uy = dy / len;
+          const head = Math.min(15, len * 0.5);
+          const hw = head * 0.4;
+          const bx = x2 - ux * head, by = y2 - uy * head;
+          const px = -uy, py = ux;
+          const op = o.opacity == null ? 1 : o.opacity;
+          const dash = o.dash ? ` stroke-dasharray="${o.dash}"` : "";
+          const f = (n) => n.toFixed(1);
+          return (
+            `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux * 1.5)}" ` +
+            `y2="${f(by + uy * 1.5)}" stroke="${color}" stroke-width="${w}" ` +
+            `stroke-opacity="${op}" stroke-linecap="round"${dash}/>` +
+            `<path d="M${f(x2)},${f(y2)} L${f(bx + px * hw)},${f(by + py * hw)} ` +
+            `L${f(bx - px * hw)},${f(by - py * hw)} Z" fill="${color}" ` +
+            `fill-opacity="${op}"/>`
+          );
+        }
+
+        function buildGrid() {
+          let g = "";
+          for (let x = XMIN; x <= XMAX; x++)
+            g += `<line x1="${sx(x)}" y1="${sy(YMIN)}" x2="${sx(x)}" y2="${sy(YMAX)}"/>`;
+          for (let y = YMIN; y <= YMAX; y++)
+            g += `<line x1="${sx(XMIN)}" y1="${sy(y)}" x2="${sx(XMAX)}" y2="${sy(y)}"/>`;
+          $("grid").innerHTML = g;
+
+          let a =
+            `<line class="axis" x1="${sx(XMIN)}" y1="${sy(0)}" x2="${sx(XMAX)}" y2="${sy(0)}"/>` +
+            `<line class="axis" x1="${sx(0)}" y1="${sy(YMIN)}" x2="${sx(0)}" y2="${sy(YMAX)}"/>`;
+          for (let x = XMIN + 2; x <= XMAX - 2; x += 2)
+            if (x !== 0)
+              a += `<text class="tick" x="${sx(x)}" y="${sy(0) + 17}">${x}</text>`;
+          for (let y = YMIN + 2; y <= YMAX - 2; y += 2)
+            if (y !== 0)
+              a += `<text class="tick" x="${sx(0) - 10}" y="${sy(y) + 4}" text-anchor="end">${y}</text>`;
+          $("axes").innerHTML = a;
+        }
+
+        // Small square marking the right angle where the drop line meets the
+        // projection line.
+        function rightAngle(cx, cy, u1, u2, size) {
+          const p = (m, n) =>
+            `${(cx + m).toFixed(1)},${(cy + n).toFixed(1)}`;
+          return (
+            `<polyline points="${p(u1[0] * size, u1[1] * size)} ` +
+            `${p((u1[0] + u2[0]) * size, (u1[1] + u2[1]) * size)} ` +
+            `${p(u2[0] * size, u2[1] * size)}" fill="none" ` +
+            `stroke="var(--ink-400)" stroke-width="1.4"/>`
+          );
+        }
+
+        function arc(cx, cy, r, a0, a1) {
+          let d = a1 - a0;
+          while (d <= -Math.PI) d += 2 * Math.PI;
+          while (d > Math.PI) d -= 2 * Math.PI;
+          const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+          const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+          return (
+            `<path d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 ` +
+            `${d > 0 ? 1 : 0} ${x1.toFixed(1)} ${y1.toFixed(1)}" fill="none" ` +
+            `stroke="var(--ink-400)" stroke-width="1.3" stroke-opacity="0.8"/>`
+          );
+        }
+
+        function draw() {
+          const swapped = $("swap").checked;
+          const src = swapped ? vec.b : vec.a; // the one being projected
+          const onto = swapped ? vec.a : vec.b; // the one projected onto
+          const srcName = swapped ? "b" : "a";
+          const ontoName = swapped ? "a" : "b";
+
+          const dot = vec.a.x * vec.b.x + vec.a.y * vec.b.y;
+          const aLen = Math.hypot(vec.a.x, vec.a.y);
+          const bLen = Math.hypot(vec.b.x, vec.b.y);
+          const ontoLen = Math.hypot(onto.x, onto.y);
+          const srcLen = Math.hypot(src.x, src.y);
+
+          // Signed shadow length, and the shadow vector itself.
+          const shadow = ontoLen ? dot / ontoLen : 0;
+          const k = ontoLen ? dot / (ontoLen * ontoLen) : 0;
+          const p = { x: k * onto.x, y: k * onto.y };
+
+          // --- the construction ---
+          let guide = "", pr = "";
+          if ($("show-proj").checked && ontoLen > 0) {
+            // onto's line, extended right across the board
+            const ux = onto.x / ontoLen, uy = onto.y / ontoLen;
+            const t = 40;
+            guide += `<line x1="${sx(-ux * t)}" y1="${sy(-uy * t)}" x2="${sx(ux * t)}" ` +
+              `y2="${sy(uy * t)}" stroke="var(--sand-400)" stroke-width="1.2" ` +
+              `stroke-dasharray="4 5"/>`;
+
+            if (srcLen > 0) {
+              // the perpendicular drop from src's tip onto that line
+              guide += `<line x1="${sx(src.x)}" y1="${sy(src.y)}" x2="${sx(p.x)}" ` +
+                `y2="${sy(p.y)}" stroke="var(--ink-400)" stroke-width="1.3" ` +
+                `stroke-opacity="0.8" stroke-dasharray="4 4"/>`;
+
+              const dropLen = Math.hypot(src.x - p.x, src.y - p.y);
+              if (dropLen > 0.15 && Math.abs(shadow) > 0.15) {
+                const d1 = [
+                  (sx(src.x) - sx(p.x)) / (dropLen * U),
+                  (sy(src.y) - sy(p.y)) / (dropLen * U),
+                ];
+                const d2 = [
+                  -Math.sign(shadow) * ux,
+                  Math.sign(shadow) * uy,
+                ];
+                guide += rightAngle(sx(p.x), sy(p.y), d1, d2, 10);
+              }
+
+              // angle arc at the origin, labelled when there is room for it
+              if (aLen > 0 && bLen > 0) {
+                const a0 = Math.atan2(sy(vec.a.y) - sy(0), sx(vec.a.x) - sx(0));
+                const a1 = Math.atan2(sy(vec.b.y) - sy(0), sx(vec.b.x) - sx(0));
+                guide += arc(sx(0), sy(0), 38, a0, a1);
+                let d = a1 - a0;
+                while (d <= -Math.PI) d += 2 * Math.PI;
+                while (d > Math.PI) d -= 2 * Math.PI;
+                if (Math.abs(d) > 0.3) {
+                  const am = a0 + d / 2;
+                  guide += `<text class="anglelabel" x="${(sx(0) + 54 * Math.cos(am)).toFixed(1)}" ` +
+                    `y="${(sy(0) + 54 * Math.sin(am)).toFixed(1)}">θ</text>`;
+                }
+              }
+            }
+            if (Math.abs(shadow) > 1e-9) {
+              pr = arrow(sx(0), sy(0), sx(p.x), sy(p.y), P_COLOR, 4.4, {});
+              // Sit the label on the far side of the projection line from the
+              // drop, so it never lands under the dashed perpendicular.
+              const nx = -onto.y / ontoLen, ny = onto.x / ontoLen;
+              const side =
+                (src.x - p.x) * nx + (src.y - p.y) * ny > 0 ? -1 : 1;
+              pr += `<text class="vlabel" x="${lx(sx(p.x + side * nx * 0.5))}" ` +
+                `y="${ly(sy(p.y + side * ny * 0.5))}" fill="${P_COLOR}">p</text>`;
+            } else if (aLen > 0 && bLen > 0) {
+              // perpendicular: mark the collapsed shadow at the origin
+              pr = `<circle cx="${sx(0)}" cy="${sy(0)}" r="5" fill="${P_COLOR}"/>`;
+            }
+          }
+          $("guide").innerHTML = guide;
+          $("proj").innerHTML = pr;
+
+          // --- the two vectors ---
+          let vs = "";
+          [["a", vec.a, A_COLOR], ["b", vec.b, B_COLOR]].forEach(([n, v, c]) => {
+            vs += arrow(sx(0), sy(0), sx(v.x), sy(v.y), c, 2.8, {});
+            const len = Math.hypot(v.x, v.y) || 1;
+            const ox = (v.x / len) * 0.46, oy = (v.y / len) * 0.46;
+            vs += `<text class="vlabel" x="${lx(sx(v.x + ox))}" ` +
+              `y="${ly(sy(v.y + oy))}" fill="${c}">${n}</text>`;
+          });
+          $("vectors").innerHTML = vs;
+
+          let hs = "";
+          [["a", vec.a, A_COLOR], ["b", vec.b, B_COLOR]].forEach(([n, v, c]) => {
+            hs += `<circle class="handle" data-v="${n}" cx="${sx(v.x)}" cy="${sy(v.y)}" ` +
+              `r="15" tabindex="0" role="button" aria-label="Drag ${n}"/>` +
+              `<circle class="handle-ring" cx="${sx(v.x)}" cy="${sy(v.y)}" r="11" stroke="${c}"/>`;
+          });
+          $("handles").innerHTML = hs;
+
+          // --- readouts ---
+          const par = (n) => (n < 0 ? `(${n})` : `${n}`);
+          $("sum").innerHTML =
+            `a · b = ${par(vec.a.x)}·${par(vec.b.x)} + ` +
+            `${par(vec.a.y)}·${par(vec.b.y)}<br />` +
+            `a · b = <b>${dot}</b>`;
+
+          $("alen").textContent = fmt(aLen, 3);
+          $("blen").textContent = fmt(bLen, 3);
+          const canAngle = aLen > 0 && bLen > 0;
+          $("theta").textContent = canAngle
+            ? fmt(
+                (Math.acos(Math.max(-1, Math.min(1, dot / (aLen * bLen)))) * 180) /
+                  Math.PI,
+                1
+              ) + "°"
+            : "—";
+
+          $("shadow-label").textContent =
+            `shadow of ${srcName} on ${ontoName}`;
+          $("times-label").textContent = `× |${ontoName}|`;
+          $("eq-label").textContent = "= a · b";
+          $("shadow").textContent = ontoLen ? fmt(shadow, 3) : "—";
+          $("times").textContent = ontoLen ? fmt(ontoLen, 3) : "—";
+          $("eq").textContent = ontoLen ? fmt(shadow * ontoLen, 3) : "—";
+
+          $("perp").hidden = !(dot === 0 && aLen > 0 && bLen > 0);
+        }
+
+        function syncInputs() {
+          [["ax", "a", "x"], ["ay", "a", "y"], ["bx", "b", "x"], ["by", "b", "y"]]
+            .forEach(([id, v, axis]) => {
+              const el = $(id);
+              if (document.activeElement !== el) el.value = vec[v][axis];
+            });
+        }
+
+        // --- input ---
+        function toBoard(evt) {
+          const r = board.getBoundingClientRect();
+          const scale = 704 / r.width;
+          return {
+            x: (evt.clientX - r.left) * scale,
+            y: (evt.clientY - r.top) * scale,
+          };
+        }
+
+        function snapWorld(pt) {
+          return {
+            x: Math.max(XMIN, Math.min(XMAX, Math.round((pt.x - OX) / U))),
+            y: Math.max(YMIN, Math.min(YMAX, Math.round((OY - pt.y) / U))),
+          };
+        }
+
+        let dragging = null;
+
+        board.addEventListener("pointerdown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          dragging = h.dataset.v;
+          $("hint").hidden = true; // it has done its job
+          h.setPointerCapture(e.pointerId);
+          e.preventDefault();
+        });
+
+        board.addEventListener("pointermove", (e) => {
+          if (!dragging) return;
+          const p = snapWorld(toBoard(e));
+          const v = vec[dragging];
+          if (p.x === v.x && p.y === v.y) return;
+          v.x = p.x;
+          v.y = p.y;
+          draw();
+          syncInputs();
+        });
+
+        const endDrag = () => (dragging = null);
+        board.addEventListener("pointerup", endDrag);
+        board.addEventListener("pointercancel", endDrag);
+
+        board.addEventListener("keydown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          const d = {
+            ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+            ArrowUp: [0, 1], ArrowDown: [0, -1],
+          }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const name = h.dataset.v, v = vec[name];
+          v.x = Math.max(XMIN, Math.min(XMAX, v.x + d[0]));
+          v.y = Math.max(YMIN, Math.min(YMAX, v.y + d[1]));
+          draw();
+          syncInputs();
+          const again = $("handles").querySelector(`.handle[data-v="${name}"]`);
+          if (again) again.focus();
+        });
+
+        [["ax", "a", "x"], ["ay", "a", "y"], ["bx", "b", "x"], ["by", "b", "y"]]
+          .forEach(([id, v, axis]) => {
+            $(id).addEventListener("input", () => {
+              const el = $(id);
+              const n = Number(el.value);
+              if (el.value === "" || Number.isNaN(n)) return;
+              const lim = axis === "x" ? XMAX : YMAX;
+              vec[v][axis] = Math.max(-lim, Math.min(lim, n));
+              draw();
+            });
+          });
+
+        $("swap").addEventListener("change", draw);
+        $("show-proj").addEventListener("change", draw);
+
+        buildGrid();
+        draw();
+      })();
+    </script>
+  </body>
+</html>

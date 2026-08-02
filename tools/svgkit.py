@@ -77,6 +77,28 @@ def arrow(p0, p1, colour, width, opacity=1.0, dash=None, head_max=12.0):
     )
 
 
+def right_angle(corner, u1, u2, size=9.0, colour=None, width=1.3):
+    """The small square that marks a right angle at `corner`, opening along
+    the unit vectors u1 and u2."""
+    cx, cy = corner
+    return polyline(
+        [
+            (cx + u1[0] * size, cy + u1[1] * size),
+            (cx + (u1[0] + u2[0]) * size, cy + (u1[1] + u2[1]) * size),
+            (cx + u2[0] * size, cy + u2[1] * size),
+        ],
+        colour,
+        width,
+    )
+
+
+def unit(p0, p1):
+    """Unit vector pointing from p0 to p1."""
+    dx, dy = p1[0] - p0[0], p1[1] - p0[1]
+    ln = math.hypot(dx, dy) or 1.0
+    return (dx / ln, dy / ln)
+
+
 def halo(p0, p1, colour, width=9.0, opacity=0.16):
     """A soft band under an arrow, so a step that lands on top of another
     vector still reads as a distinct part of the walk."""

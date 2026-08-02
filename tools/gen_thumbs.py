@@ -7,7 +7,7 @@ earth palette as assets/theme.css. Re-run after changing the palette:
     python3 tools/gen_thumbs.py
 """
 
-from svgkit import P, arrow, line, svg_doc, write_svg
+from svgkit import P, arrow, line, right_angle, svg_doc, unit, write_svg
 
 W, H = 320, 160
 
@@ -48,5 +48,46 @@ def lincomb():
     )
 
 
+# ------------------------------------------------------------- dot products
+def dotproduct():
+    """Vector a, vector b, and the shadow a casts on b."""
+    u, ox, oy = 26.0, 62.0, 118.0
+
+    def V(x, y):
+        return (ox + u * x, oy - u * y)
+
+    a, b = (3, 3), (7, 1)
+    d = a[0] * b[0] + a[1] * b[1]
+    bb = b[0] ** 2 + b[1] ** 2
+    p = (d / bb * b[0], d / bb * b[1])
+
+    body = []
+    for gx in range(-2, 10):
+        body.append(line((ox + u * gx, 8), (ox + u * gx, 152), P["grid"], 1.0))
+    for gy in range(-4, 5):
+        body.append(line((8, oy - u * gy), (312, oy - u * gy), P["grid"], 1.0))
+
+    o, at, bt, pt = V(0, 0), V(*a), V(*b), V(*p)
+    body.append(line(V(-2, -0.29), V(9, 1.29), P["sand400"], 1.1, dash="4 4"))
+    body.append(line(at, pt, P["ink400"], 1.2, 0.8, dash="4 3"))
+    body.append(right_angle(pt, unit(pt, at), unit(pt, o), 7, P["ink400"], 1.1))
+    body.append(arrow(o, bt, P["sage"], 2.2))
+    body.append(arrow(o, pt, P["ochre"], 3.4, head_max=11))
+    body.append(arrow(o, at, P["clay"], 2.2))
+
+    write_svg(
+        "assets/thumbs/dotproduct.svg",
+        svg_doc(
+            W,
+            H,
+            body,
+            "One vector projected onto another",
+            background=P["plate"],
+            clip_id="plate",
+        ),
+    )
+
+
 if __name__ == "__main__":
     lincomb()
+    dotproduct()
