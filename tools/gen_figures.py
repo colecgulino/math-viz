@@ -215,6 +215,48 @@ def length_squares():
     )
 
 
+def triangle_strict():
+    """a and b tip to tail, with a + b as the direct route."""
+    body = plate()
+    o, at, sm = V(0, 0), V(3, 1), V(4, 4)
+
+    body.append(arrow(o, at, P["clay"], 2.6))
+    body.append(arrow(at, sm, P["sage"], 2.6))
+    body.append(arrow(o, sm, P["ink900"], 3.0))
+
+    # All three labels sit outside the triangle, each beside its own edge —
+    # the interior is a narrow wedge, and a backing box placed in it punches a
+    # gap in whichever arrow it lands on.
+    body.append(text(165, 212, "|a|", P["clay"], 13, boxed=BG))
+    body.append(text(227, 128, "|b|", P["sage"], 13, boxed=BG))
+    body.append(text(120, 120, "|a + b|", P["ink900"], 13, boxed=BG))
+
+    write_svg(
+        "assets/figures/triangle-strict.svg",
+        svg_doc(PW, PH, body, "Two vectors tip to tail with the shorter direct route between the ends"),
+    )
+
+
+def triangle_equality():
+    """The degenerate case: a and b parallel, so the triangle flattens."""
+    body = plate()
+    o, at, sm = V(0, 0), V(2, 1), V(6, 3)
+
+    # a + b lies exactly under the other two, so it goes down as a band
+    body.append(halo(o, sm, P["ink900"], 11, 0.2))
+    body.append(arrow(o, at, P["clay"], 2.6))
+    body.append(arrow(at, sm, P["sage"], 2.6))
+
+    body.append(text(100, 186, "|a|", P["clay"], 13, boxed=BG))
+    body.append(text(220, 126, "|b|", P["sage"], 13, boxed=BG))
+    body.append(text(200, 185, "|a + b|", P["ink900"], 13, boxed=BG))
+
+    write_svg(
+        "assets/figures/triangle-equality.svg",
+        svg_doc(PW, PH, body, "Two parallel vectors, where the triangle collapses onto a line"),
+    )
+
+
 def plate_at(u, ox, oy, cells_x, cells_y):
     """plate() with a custom scale and origin."""
     out = [
@@ -241,3 +283,5 @@ if __name__ == "__main__":
     dot_perpendicular()
     length_pythagoras()
     length_squares()
+    triangle_strict()
+    triangle_equality()

@@ -39,6 +39,14 @@
         font-size: 1.35rem;
         margin-bottom: 16px;
       }
+      .explainer h3 {
+        font-size: 1.02rem;
+        margin: 32px 0 12px;
+        color: var(--clay-600);
+      }
+      .muted-note {
+        color: var(--ink-400);
+      }
       .explainer p {
         max-width: var(--measure);
         margin: 0 0 17px;
@@ -105,8 +113,51 @@
       }
 
       /* ---- board ---- */
+      .board-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+      }
       .board-wrap {
         position: relative;
+      }
+      #cosplot {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      /* Anchoring is set in CSS, so each variant needs its own class —
+         a text-anchor attribute would lose to the class rule. */
+      .ctick {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+      }
+      .ctick-y {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        fill: var(--ink-400);
+        text-anchor: end;
+        dominant-baseline: middle;
+      }
+      .cnote {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+      }
+      .clabel {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        fill: var(--ink-500);
+      }
+      .creadout {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        fill: var(--ink-900);
+        dominant-baseline: middle;
       }
       #board {
         touch-action: none;
@@ -379,21 +430,34 @@
     </div>
 
     <div class="stage page" id="board-section">
-      <div class="plate">
-        <div class="board-wrap">
+      <div class="board-col">
+        <div class="plate">
+          <div class="board-wrap">
+            <svg
+              id="board"
+              viewBox="0 0 704 528"
+              aria-label="Two vectors with the projection of one onto the other"
+            >
+              <g id="grid"></g>
+              <g id="axes"></g>
+              <g id="guide"></g>
+              <g id="proj"></g>
+              <g id="vectors"></g>
+              <g id="handles"></g>
+            </svg>
+            <p class="hint" id="hint">Drag either arrowhead.</p>
+          </div>
+        </div>
+
+        <div class="plate">
           <svg
-            id="board"
-            viewBox="0 0 704 528"
-            aria-label="Two vectors with the projection of one onto the other"
+            id="cosplot"
+            viewBox="0 0 704 218"
+            aria-label="Cosine plotted from zero to 360 degrees, with the current angle marked"
           >
-            <g id="grid"></g>
-            <g id="axes"></g>
-            <g id="guide"></g>
-            <g id="proj"></g>
-            <g id="vectors"></g>
-            <g id="handles"></g>
+            <g id="cos-static"></g>
+            <g id="cos-marker"></g>
           </svg>
-          <p class="hint" id="hint">Drag either arrowhead.</p>
         </div>
       </div>
 
@@ -511,6 +575,146 @@
           for free.
         </p>
       </section>
+
+      <section>
+        <h2>Two inequalities fall out of this</h2>
+        <p>
+          Put the dot product and the length formula together and two bounds
+          appear. They look like technicalities. They are the reason any of the
+          preceding vocabulary is allowed to exist.
+        </p>
+
+        <h3>Cauchy–Schwarz</h3>
+        <div class="calc">|a · b| &nbsp;≤&nbsp; |a| |b|</div>
+        <p>
+          The geometric formula makes this nearly self-evident:
+          a · b = |a| |b| cos θ, and cos θ never escapes the band between −1 and
+          1 — which is the entire content of the curve plotted under the board.
+          Multiply through and the product of two vectors can never exceed the
+          product of their lengths.
+        </p>
+        <p>
+          The picture says it even faster. The shadow of
+          <span class="sym">a</span> on <span class="sym">b</span> has length
+          |a| |cos θ|, and a shadow is never longer than the thing casting it.
+          Multiply both sides of |shadow| ≤ |a| by |b| and you have the
+          inequality.
+        </p>
+        <p>
+          Deriving it without leaning on the angle takes one more step, and is
+          worth seeing because it never mentions geometry at all. Pick any
+          number <span class="sym">t</span>, slide
+          <span class="sym">t</span><span class="sym">b</span> along
+          <span class="sym">b</span>'s line, and look at what is left over. It's
+          a vector, so its squared length cannot be negative:
+        </p>
+        <div class="calc">
+          |a − tb|² &nbsp;=&nbsp; (a − tb) · (a − tb)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;
+          |a|² − 2t(a · b) + t²|b|² &nbsp;≥&nbsp; 0
+        </div>
+        <p>
+          That is a quadratic in <span class="sym">t</span> that never dips
+          below zero, so it cannot cross the axis twice, so its discriminant is
+          at most zero:
+        </p>
+        <div class="calc">
+          4(a · b)² − 4|a|²|b|² &nbsp;≤&nbsp; 0<br />
+          (a · b)² &nbsp;≤&nbsp; |a|²|b|² <span class="muted">→</span>
+          |a · b| &nbsp;≤&nbsp; |a| |b|
+        </div>
+        <p>
+          <span class="muted-note"
+            >(If <span class="sym">b</span> is the zero vector both sides are
+            zero and there is nothing to prove.)</span
+          >
+          The <span class="sym">t</span> that minimises that quadratic works out
+          to (a · b)/|b|² — precisely the coefficient that produces the shadow on
+          the board. So the algebra is doing exactly what the picture does:
+          subtract off the shadow, then note that whatever sticks out sideways
+          still has a length, and lengths are never negative. Equality happens
+          when nothing sticks out — when <span class="sym">a</span> is a multiple
+          of <span class="sym">b</span>.
+        </p>
+
+        <h3>The triangle inequality</h3>
+        <div class="calc">|a + b| &nbsp;≤&nbsp; |a| + |b|</div>
+        <p>
+          Expand a sum the same way, using
+          <span class="sym">v</span> · <span class="sym">v</span> = |v|²:
+        </p>
+        <div class="calc">
+          |a + b|² &nbsp;=&nbsp; (a + b) · (a + b) &nbsp;=&nbsp;
+          |a|² + 2(a · b) + |b|²
+        </div>
+        <p>
+          Cauchy–Schwarz caps that middle term at |a| |b|, and the rest is a
+          perfect square:
+        </p>
+        <div class="calc">
+          |a + b|² &nbsp;≤&nbsp; |a|² + 2|a| |b| + |b|² &nbsp;=&nbsp;
+          (|a| + |b|)²
+        </div>
+        <p>
+          Both sides are non-negative, so taking square roots preserves the
+          inequality and the result follows.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/triangle-strict.svg"
+              alt="Vectors a and b laid tip to tail, with the shorter direct arrow a plus b closing the triangle."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">|a + b| &lt; |a| + |b|</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/triangle-equality.svg"
+              alt="Two parallel vectors laid tip to tail, where the triangle collapses flat onto a line."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">|a + b| = |a| + |b|</p>
+          </div>
+          <figcaption>
+            The detour and the direct route, and the one case where they agree.
+          </figcaption>
+        </figure>
+
+        <p>
+          The name carries the intuition. Lay <span class="sym">a</span> and
+          <span class="sym">b</span> tip to tail — the same walk the
+          <a href="../linear-combinations/">linear combinations</a> board draws
+          — and <span class="sym">a</span> + <span class="sym">b</span> is the
+          direct arrow from start to finish. The inequality says the direct
+          route is never longer than the detour. The two agree only when the
+          detour isn't one: when the vectors point the same way and the triangle
+          flattens onto a line.
+        </p>
+
+        <h3>Why they matter</h3>
+        <p>
+          These two bounds are what promote |v| = √(v · v) from a formula into a
+          usable notion of distance. Define the distance between two points as
+          |u − v| and the triangle inequality becomes the promise that you can
+          never get somewhere faster by detouring through a third point. A
+          "distance" without that guarantee would tell you nothing.
+        </p>
+        <p>
+          Cauchy–Schwarz does the same job for angle. Rearranged, the geometric
+          formula reads cos θ = (a · b) / (|a| |b|), and to recover
+          <span class="sym">θ</span> you feed that ratio to arccos — which only
+          accepts inputs between −1 and 1. Cauchy–Schwarz is exactly the promise
+          that the ratio never escapes that range, in any number of dimensions.
+          You cannot picture the angle between two thousand-component vectors,
+          but the inequality guarantees there is one to talk about. Every time a
+          search engine or recommender compares two embeddings by cosine
+          similarity, that is the guarantee it is standing on.
+        </p>
+      </section>
     </div>
 
     <section class="notes page">
@@ -533,6 +737,16 @@
         vector gets projected changes the shadow entirely — but the two lengths
         it gets multiplied by change to compensate, and the product lands on the
         same number. That is a · b = b · a, visible as a construction.
+      </p>
+      <p>
+        The curve underneath plots cos θ across a full turn, with the dot at the
+        angle the two vectors currently make. Watch it slide left as they close
+        up and right as they open out. It only ever travels the unshaded half:
+        the angle between two vectors is unsigned, so it runs from 0° to 180°
+        and no further — swinging <span class="sym">a</span> further round just
+        starts closing the gap again from the other side. And the curve never
+        leaves the band between −1 and 1, which is the whole of Cauchy–Schwarz
+        in one picture.
       </p>
     </section>
 
@@ -598,6 +812,80 @@
             if (y !== 0)
               a += `<text class="tick" x="${sx(0) - 10}" y="${sy(y) + 4}" text-anchor="end">${y}</text>`;
           $("axes").innerHTML = a;
+        }
+
+        // --- the cos θ plot under the board ---
+        const CX0 = 58, CX1 = 686, CYM = 104, CAMP = 76;
+        const CTOP = CYM - CAMP, CBOT = CYM + CAMP;
+        const cdx = (deg) => CX0 + (deg / 360) * (CX1 - CX0);
+        const cdy = (c) => CYM - c * CAMP;
+
+        function buildCosPlot() {
+          let s = "";
+          // The angle between two vectors is unsigned and never exceeds 180°,
+          // so the right half of the domain is unreachable from the board.
+          s += `<rect x="${cdx(180)}" y="${CTOP - 10}" width="${cdx(360) - cdx(180)}" ` +
+            `height="${CBOT - CTOP + 20}" fill="var(--sand-300)" opacity="0.6"/>`;
+          for (let d = 0; d <= 360; d += 45)
+            s += `<line x1="${cdx(d)}" y1="${CTOP - 10}" x2="${cdx(d)}" ` +
+              `y2="${CBOT + 10}" stroke="var(--grid-line)" stroke-width="1"/>`;
+          [-1, -0.5, 0.5, 1].forEach((c) => {
+            s += `<line x1="${CX0}" y1="${cdy(c)}" x2="${CX1}" y2="${cdy(c)}" ` +
+              `stroke="var(--grid-line)" stroke-width="1"/>`;
+          });
+          s += `<line x1="${CX0}" y1="${CYM}" x2="${CX1}" y2="${CYM}" ` +
+            `stroke="var(--axis-line)" stroke-width="1.3"/>`;
+          s += `<line x1="${CX0}" y1="${CTOP - 10}" x2="${CX0}" y2="${CBOT + 10}" ` +
+            `stroke="var(--axis-line)" stroke-width="1.3"/>`;
+
+          let pts = "";
+          for (let d = 0; d <= 360; d += 2)
+            pts += `${cdx(d).toFixed(1)},${cdy(Math.cos((d * Math.PI) / 180)).toFixed(1)} `;
+          s += `<polyline points="${pts.trim()}" fill="none" stroke="#8c6239" ` +
+            `stroke-width="2.2" stroke-linejoin="round"/>`;
+
+          [0, 90, 180, 270, 360].forEach((d) => {
+            s += `<text class="ctick" x="${cdx(d)}" y="${CBOT + 30}">${d}°</text>`;
+          });
+          [[1, "1"], [0, "0"], [-1, "−1"]].forEach(([c, t]) => {
+            s += `<text class="ctick-y" x="${CX0 - 12}" y="${cdy(c)}">${t}</text>`;
+          });
+          s += `<text class="clabel" x="${CX0}" y="${CTOP - 16}">cos θ</text>`;
+          s += `<text class="cnote" x="${(cdx(180) + cdx(360)) / 2}" ` +
+            `y="${CTOP + 16}">θ never exceeds 180°</text>`;
+          $("cos-static").innerHTML = s;
+        }
+
+        function drawCosMarker(thetaDeg, ok) {
+          if (!ok) {
+            $("cos-marker").innerHTML = "";
+            return;
+          }
+          const c = Math.cos((thetaDeg * Math.PI) / 180);
+          const x = cdx(thetaDeg), y = cdy(c);
+          let s =
+            `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" ` +
+            `y2="${CYM}" stroke="var(--ink-400)" stroke-width="1.2" stroke-dasharray="4 4"/>` +
+            `<line x1="${CX0}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" ` +
+            `y2="${y.toFixed(1)}" stroke="var(--ink-400)" stroke-width="1.2" stroke-dasharray="4 4"/>` +
+            `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="${A_COLOR}" ` +
+            `stroke="var(--sand-100)" stroke-width="2"/>`;
+          // Flip the label below the dot near the top of the plot, and to the
+          // left of it near the right edge, so it always stays on the plate.
+          const label = `θ = ${thetaDeg.toFixed(1)}°, cos θ = ${c.toFixed(3)}`;
+          const near = x > CX1 - 210;
+          const ty = y < CTOP + 28 ? y + 24 : y - 16;
+          const tx = near ? x - 14 : x + 14;
+          // The curve runs straight through wherever this lands, so it needs
+          // a backing to stay readable.
+          const lw = label.length * 7.9 + 12;
+          s += `<rect x="${(near ? tx - lw + 6 : tx - 6).toFixed(1)}" ` +
+            `y="${(ty - 10).toFixed(1)}" width="${lw.toFixed(1)}" height="20" rx="4" ` +
+            `fill="var(--sand-100)" opacity="0.9"/>`;
+          s += `<text class="creadout" x="${tx.toFixed(1)}" ` +
+            `y="${ty.toFixed(1)}" text-anchor="${near ? "end" : "start"}">` +
+            `${label}</text>`;
+          $("cos-marker").innerHTML = s;
         }
 
         // Small square marking the right angle where the drop line meets the
@@ -734,13 +1022,12 @@
           $("alen").textContent = fmt(aLen, 3);
           $("blen").textContent = fmt(bLen, 3);
           const canAngle = aLen > 0 && bLen > 0;
-          $("theta").textContent = canAngle
-            ? fmt(
-                (Math.acos(Math.max(-1, Math.min(1, dot / (aLen * bLen)))) * 180) /
-                  Math.PI,
-                1
-              ) + "°"
-            : "—";
+          const thetaDeg = canAngle
+            ? (Math.acos(Math.max(-1, Math.min(1, dot / (aLen * bLen)))) * 180) /
+              Math.PI
+            : 0;
+          $("theta").textContent = canAngle ? fmt(thetaDeg, 1) + "°" : "—";
+          drawCosMarker(thetaDeg, canAngle);
 
           $("shadow-label").textContent =
             `shadow of ${srcName} on ${ontoName}`;
@@ -838,6 +1125,7 @@
         $("show-proj").addEventListener("change", draw);
 
         buildGrid();
+        buildCosPlot();
         draw();
       })();
     </script>
