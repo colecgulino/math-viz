@@ -98,6 +98,27 @@
       .calc .muted {
         color: var(--ink-400);
       }
+      /* The coefficients carried through the substitution unchanged. */
+      .calc b {
+        color: var(--clay-600);
+        font-weight: 500;
+      }
+
+      .steps {
+        max-width: var(--measure);
+        margin: 0 0 18px;
+        padding-left: 22px;
+        color: var(--ink-700);
+      }
+      .steps li {
+        margin-bottom: 9px;
+        padding-left: 4px;
+      }
+      .steps li::marker {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--clay-600);
+      }
       @media (max-width: 660px) {
         .two-up {
           grid-template-columns: 1fr;
@@ -452,11 +473,42 @@
           T(v) = T(x<span class="sym">î</span> + y<span class="sym">ĵ</span>)
           = x·T(<span class="sym">î</span>) + y·T(<span class="sym">ĵ</span>)
         </div>
+        <h3>Only the basis moves</h3>
         <p>
-          The transformation of <em>any</em> vector is determined entirely by
-          where those two basis vectors land. Two vectors, four numbers, and the
-          fate of every point in the plane is decided. Stack the landing spots
-          as columns and you have the matrix:
+          Look carefully at what survived that step. On the left,
+          <span class="sym">x</span> and <span class="sym">y</span> were
+          multiplying <span class="sym">î</span> and
+          <span class="sym">ĵ</span>. On the right, the very same
+          <span class="sym">x</span> and <span class="sym">y</span> are
+          multiplying T(<span class="sym">î</span>) and
+          T(<span class="sym">ĵ</span>). The coefficients were never touched. A
+          linear transformation does not renegotiate the recipe — it only
+          relocates the ingredients. Where you used to take two steps along
+          <span class="sym">î</span>, you now take two steps along wherever
+          <span class="sym">î</span> ended up.
+        </p>
+        <p>
+          Which means the entire job reduces to two moves, and the first one you
+          only have to do once:
+        </p>
+        <ol class="steps">
+          <li>
+            Find where the basis vectors land. Two arrows,
+            T(<span class="sym">î</span>) and T(<span class="sym">ĵ</span>),
+            and you are done thinking about the transformation.
+          </li>
+          <li>
+            For any vector, read off its coordinates and rebuild the same linear
+            combination using those two new arrows in place of the old ones.
+          </li>
+        </ol>
+        <p>
+          Nothing else is required. Not the vector's length, not its direction,
+          not where it sits — just its two coordinates, recombined over a moved
+          basis. That is why a 2×2 grid of numbers is enough to specify what
+          happens to infinitely many points at once: it is not describing the
+          points, it is describing the two arrows they are all measured against.
+          Stack those landing spots as columns and you have the matrix.
         </p>
 
         <figure class="two-up">
@@ -487,20 +539,43 @@
         </figure>
 
         <p>
-          Writing those columns side by side gives M, and multiplying a vector
-          by it is nothing more elaborate than the linear combination above,
-          carried out with the columns:
+          Written out, the two columns of that figure's matrix are exactly
+          those two landing spots:
         </p>
         <div class="calc">
-          M = [ 2 &nbsp;−1 ; &nbsp;1 &nbsp;&nbsp;1 ]<br /><br />
-          M v = 2·(2, 1) + 1·(−1, 1) = (3, 3)
-          <span class="muted">&nbsp;&nbsp;for v = (2, 1)</span>
+          M<span class="sym">î</span> = (2, 1)
+          <span class="muted">&nbsp;&nbsp;first column</span><br />
+          M<span class="sym">ĵ</span> = (−1, 1)
+          <span class="muted">&nbsp;&nbsp;second column</span>
+        </div>
+        <p>
+          Now push <span class="sym">v</span> = (2, 1) through, following the
+          two steps. Watch the 2 and the 1 stay exactly where they are while
+          everything they are multiplying gets swapped out:
+        </p>
+        <div class="calc">
+          <span class="sym">v</span> &nbsp;=&nbsp;
+          <b>2</b><span class="sym">î</span> +
+          <b>1</b><span class="sym">ĵ</span>
+          <span class="muted">&nbsp;&nbsp;its coordinates</span><br />
+          M<span class="sym">v</span> &nbsp;=&nbsp;
+          <b>2</b>(M<span class="sym">î</span>) +
+          <b>1</b>(M<span class="sym">ĵ</span>)
+          <span class="muted">&nbsp;&nbsp;same recipe, moved basis</span><br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp; <b>2</b>(2, 1) +
+          <b>1</b>(−1, 1)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp; (4, 2) + (−1, 1)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp; (3, 3)
         </div>
         <p>
           That is the whole of matrix-vector multiplication: take x copies of
-          the first column, y copies of the second, and add. Everything else —
-          rotations, reflections, projections, the lot — is a question of which
-          four numbers you choose.
+          the first column, y copies of the second, and add. It is the same
+          tip-to-tail walk as
+          <a href="../linear-combinations/">linear combinations</a>, taken over
+          a basis that has been picked up and put down somewhere else — which is
+          why the board below can get away with drawing only two bold arrows.
+          Everything else, rotations and reflections and projections and the
+          lot, is a question of which four numbers you choose.
         </p>
       </section>
     </div>
