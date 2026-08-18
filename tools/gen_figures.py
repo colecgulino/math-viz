@@ -257,6 +257,58 @@ def triangle_equality():
     )
 
 
+# ---------------------------------------------------- linear transformations
+TU, TOX, TOY = 40, 110, 210
+
+
+def TV(x, y):
+    return (TOX + TU * x, TOY - TU * y)
+
+
+def _basis_panel(name, i_img, j_img, v_img, ilab, jlab, vlab, ipos, jpos, vpos,
+                 title):
+    """One half of the before/after pair: the unit square (or its image), the
+    two basis vectors (or theirs), and a sample vector along for the ride."""
+    body = plate_at(TU, TOX, TOY, (-2, 6), (-2, 5))
+    o, it, jt = TV(0, 0), TV(*i_img), TV(*j_img)
+    corner = TV(i_img[0] + j_img[0], i_img[1] + j_img[1])
+
+    body.append(
+        f'<path d="M{o[0]},{o[1]} L{it[0]},{it[1]} L{corner[0]},{corner[1]} '
+        f'L{jt[0]},{jt[1]} Z" fill="{P["ochre"]}" fill-opacity="0.15" '
+        f'stroke="{P["ochre"]}" stroke-width="1.3" stroke-opacity="0.55"/>'
+    )
+    body.append(arrow(o, TV(*v_img), P["ink900"], 2.6))
+    body.append(arrow(o, it, P["clay"], 3.2, head_max=12))
+    body.append(arrow(o, jt, P["sage"], 3.2, head_max=12))
+
+    body.append(text(*ipos, ilab, P["clay"], 15, "serif", italic=True, boxed=BG))
+    body.append(text(*jpos, jlab, P["sage"], 15, "serif", italic=True, boxed=BG))
+    body.append(text(*vpos, vlab, P["ink900"], 15, "serif", italic=True, boxed=BG))
+
+    write_svg(f"assets/figures/{name}.svg", svg_doc(PW, PH, body, title))
+
+
+def transform_before():
+    _basis_panel(
+        "transform-before",
+        (1, 0), (0, 1), (2, 1),
+        "î", "ĵ", "v",
+        (152, 230), (88, 168), (206, 158),
+        "The unit square with i-hat, j-hat and a sample vector v",
+    )
+
+
+def transform_after():
+    _basis_panel(
+        "transform-after",
+        (2, 1), (-1, 1), (3, 3),
+        "Mî", "Mĵ", "Mv",
+        (208, 186), (54, 156), (248, 80),
+        "The same square sheared into a parallelogram by the matrix M",
+    )
+
+
 def plate_at(u, ox, oy, cells_x, cells_y):
     """plate() with a custom scale and origin."""
     out = [
@@ -285,3 +337,5 @@ if __name__ == "__main__":
     length_squares()
     triangle_strict()
     triangle_equality()
+    transform_before()
+    transform_after()

@@ -579,7 +579,7 @@
         // Hues come from the palette's warm band (red through ochre to olive),
         // walked in an order that puts a wide gap between consecutive picks —
         // pure random kept handing out two near-identical clays in a row.
-        const HUES = [18, 84, 40, 12, 56, 96, 28, 70, 46, 32];
+        const HUES = [18, 84, 40, 96, 28, 70, 12, 56];
         let hueCursor = Math.floor(Math.random() * HUES.length);
         function warmColor() {
           const h = HUES[hueCursor % HUES.length] + (Math.random() * 8 - 4);

@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linear Transformations — math-viz</title>
+    <meta
+      name="description"
+      content="A matrix is a recipe for moving every point in the plane at once. Watch a grid deform under one."
+    />
+    <link rel="stylesheet" href="../../assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* ---- explainer prose ---- */
+      .jump {
+        display: inline-block;
+        margin-top: 18px;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .jump:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .explainer {
+        padding-block: 10px 6px;
+      }
+      .explainer > section + section {
+        margin-top: 46px;
+      }
+      .explainer h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+      }
+      .explainer h3 {
+        font-size: 1.02rem;
+        margin: 30px 0 12px;
+        color: var(--clay-600);
+      }
+      .explainer p {
+        max-width: var(--measure);
+        margin: 0 0 17px;
+      }
+      .explainer figure {
+        margin: 26px 0 28px;
+        max-width: 800px;
+      }
+      .explainer figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .two-up {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+      }
+      .two-up figcaption {
+        grid-column: 1 / -1;
+      }
+      .fig-cap {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-500);
+        text-align: center;
+        margin: 12px 0 0 !important;
+      }
+      .explainer figcaption {
+        max-width: var(--measure);
+        margin-top: 14px;
+        font-size: 0.86rem;
+        color: var(--ink-400);
+      }
+      .sym {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-900);
+      }
+      .calc {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        line-height: 1.9;
+        color: var(--ink-900);
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        max-width: var(--measure);
+        overflow-x: auto;
+      }
+      .calc .muted {
+        color: var(--ink-400);
+      }
+      @media (max-width: 660px) {
+        .two-up {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+      }
+
+      /* ---- boards ---- */
+      .plate svg {
+        touch-action: none;
+      }
+      /* The starting grid has to stay legible under the transformed one —
+         it is the reference you read the motion against. */
+      .ghost line {
+        stroke: var(--sand-500);
+        stroke-width: 1;
+      }
+      .ghost circle {
+        fill: var(--sand-500);
+      }
+      .ghost .ax {
+        stroke: #b3a389;
+        stroke-width: 1.6;
+      }
+      /* Clay marks the image of the x-axis family, sage the y-axis family —
+         the same colours the basis vectors carry throughout. */
+      .fam-i,
+      .fam-j,
+      .axis-i,
+      .axis-j {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .fam-i {
+        stroke: #bf5b2e;
+        stroke-opacity: 0.45;
+        stroke-width: 1.4;
+      }
+      .fam-j {
+        stroke: #5f7161;
+        stroke-opacity: 0.45;
+        stroke-width: 1.4;
+      }
+      .axis-i {
+        stroke: #bf5b2e;
+        stroke-opacity: 0.9;
+        stroke-width: 2.2;
+      }
+      .axis-j {
+        stroke: #5f7161;
+        stroke-opacity: 0.9;
+        stroke-width: 2.2;
+      }
+      #a-dots circle {
+        fill: #8c6239;
+      }
+      .tick {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+      }
+      .vlabel {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 15px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+      }
+      .handle {
+        fill: transparent;
+        cursor: grab;
+      }
+      .handle:active {
+        cursor: grabbing;
+      }
+      .handle-ring {
+        fill: none;
+        stroke-width: 1.5;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 110ms ease;
+      }
+      .handle:hover + .handle-ring,
+      .handle:focus-visible + .handle-ring {
+        opacity: 0.55;
+      }
+
+      .board-wrap {
+        position: relative;
+      }
+      .hint {
+        position: absolute;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        background: rgba(246, 239, 227, 0.92);
+        border: var(--border);
+        border-radius: 999px;
+        padding: 4px 13px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .hint[hidden] {
+        display: none;
+      }
+
+      /* side-by-side spaces */
+      .pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        min-width: 0;
+      }
+      .pair .fig-cap {
+        margin-top: 10px !important;
+      }
+      @media (max-width: 860px) {
+        .pair {
+          grid-template-columns: 1fr;
+          gap: 22px;
+        }
+      }
+
+      /* ---- controls ---- */
+      .modes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-bottom: 16px;
+      }
+      .modes button {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        color: var(--ink-500);
+        background: transparent;
+        border: 1px solid var(--sand-400);
+        border-radius: 7px;
+        padding: 7px 4px;
+        cursor: pointer;
+        transition: border-color 120ms ease, color 120ms ease,
+          background-color 120ms ease;
+      }
+      .modes button:hover {
+        border-color: var(--clay-400);
+        color: var(--clay-600);
+      }
+      .modes button[aria-pressed="true"] {
+        border-color: var(--clay-500);
+        color: var(--clay-600);
+        background: rgba(191, 91, 46, 0.08);
+      }
+      .modes button:focus-visible {
+        outline: 2px solid var(--clay-500);
+        outline-offset: 2px;
+      }
+
+      .control {
+        margin-bottom: 15px;
+      }
+      .control-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 4px;
+      }
+      .control label {
+        font-size: 0.9rem;
+        color: var(--ink-700);
+      }
+      .control output {
+        font-family: var(--font-mono);
+        font-size: 0.84rem;
+        color: var(--clay-600);
+      }
+
+      /* 2x2 matrix, displayed or editable, with real brackets */
+      .matrix {
+        display: inline-grid;
+        grid-template-columns: repeat(2, minmax(52px, 1fr));
+        gap: 6px 12px;
+        position: relative;
+        padding: 9px 16px;
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        color: var(--ink-900);
+        width: 100%;
+      }
+      .matrix::before,
+      .matrix::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        border: 1.5px solid var(--ink-400);
+      }
+      .matrix::before {
+        left: 0;
+        border-right: none;
+      }
+      .matrix::after {
+        right: 0;
+        border-left: none;
+      }
+      .matrix span {
+        text-align: right;
+      }
+      .matrix input {
+        text-align: right;
+        padding: 3px 6px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        border-top: var(--border);
+        padding-top: 13px;
+        margin-top: 14px;
+      }
+      .stats span:nth-child(even) {
+        color: var(--ink-900);
+        text-align: right;
+      }
+      .note {
+        font-size: 0.82rem;
+        color: var(--ink-500);
+        margin: 10px 0 0;
+        line-height: 1.5;
+      }
+      .note--warn {
+        color: var(--clay-600);
+      }
+      .note[hidden],
+      .control[hidden],
+      #a-matrix-wrap[hidden] {
+        display: none;
+      }
+
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 14px;
+      }
+
+      .vlist {
+        list-style: none;
+        margin: 0 0 12px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .vrow {
+        display: grid;
+        grid-template-columns: 12px 24px 1fr 24px;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+      }
+      .vrow .img {
+        grid-column: 3 / 4;
+        color: var(--ink-400);
+      }
+      .swatch {
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+      }
+      .vname {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--ink-900);
+      }
+      .icon-btn {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        font-size: 1rem;
+        color: var(--ink-400);
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: color 120ms ease, border-color 120ms ease;
+      }
+      .icon-btn:hover {
+        color: var(--clay-600);
+        border-color: var(--clay-200);
+      }
+      .icon-btn:focus-visible {
+        outline: 2px solid var(--clay-500);
+        outline-offset: 1px;
+      }
+      .empty {
+        font-size: 0.86rem;
+        color: var(--ink-400);
+        margin: 0 0 12px;
+      }
+      .empty[hidden] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topbar page"><a href="../../">&larr; Index</a></nav>
+
+    <header class="intro page">
+      <h1>Linear Transformations</h1>
+      <p>
+        A matrix looks like a small table of numbers. It is better understood as
+        a set of instructions for picking up the entire plane and putting it
+        down somewhere else — stretched, rotated, sheared, or flattened — with
+        every point moving at once and in step.
+      </p>
+      <a class="jump" href="#grid-section">Skip to the board &darr;</a>
+    </header>
+
+    <div class="explainer page">
+      <section>
+        <h2>A matrix is a place to send î and ĵ</h2>
+        <p>
+          A transformation is a function that takes a vector and returns a
+          vector. What makes one <em>linear</em> is that it respects the two
+          operations a vector space is built from: adding first and then
+          transforming gives the same answer as transforming first and then
+          adding, and the same holds for scaling. Visually that has a very
+          concrete consequence — grid lines stay straight, stay parallel, and
+          stay evenly spaced, and the origin does not move.
+        </p>
+        <p>
+          Now recall from
+          <a href="../linear-combinations/">linear combinations</a> that every
+          vector is already written over the basis: (x, y) means
+          x<span class="sym">î</span> + y<span class="sym">ĵ</span>. Feed that
+          through a linear map and the two rules let you pull it apart:
+        </p>
+        <div class="calc">
+          T(v) = T(x<span class="sym">î</span> + y<span class="sym">ĵ</span>)
+          = x·T(<span class="sym">î</span>) + y·T(<span class="sym">ĵ</span>)
+        </div>
+        <p>
+          The transformation of <em>any</em> vector is determined entirely by
+          where those two basis vectors land. Two vectors, four numbers, and the
+          fate of every point in the plane is decided. Stack the landing spots
+          as columns and you have the matrix:
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/transform-before.svg"
+              alt="The unit square with i-hat along x, j-hat along y, and a sample vector v at (2, 1)."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">before</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/transform-after.svg"
+              alt="The same square pushed into a parallelogram, with the basis vectors and v carried along."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">after M</p>
+          </div>
+          <figcaption>
+            <span class="sym">î</span> lands on (2, 1) and
+            <span class="sym">ĵ</span> on (−1, 1) — the two columns of M. The
+            unit square between them becomes the parallelogram between their
+            images, and <span class="sym">v</span> rides along.
+          </figcaption>
+        </figure>
+
+        <p>
+          Writing those columns side by side gives M, and multiplying a vector
+          by it is nothing more elaborate than the linear combination above,
+          carried out with the columns:
+        </p>
+        <div class="calc">
+          M = [ 2 &nbsp;−1 ; &nbsp;1 &nbsp;&nbsp;1 ]<br /><br />
+          M v = 2·(2, 1) + 1·(−1, 1) = (3, 3)
+          <span class="muted">&nbsp;&nbsp;for v = (2, 1)</span>
+        </div>
+        <p>
+          That is the whole of matrix-vector multiplication: take x copies of
+          the first column, y copies of the second, and add. Everything else —
+          rotations, reflections, projections, the lot — is a question of which
+          four numbers you choose.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="grid-section">
+      <div>
+        <div class="plate">
+          <div class="board-wrap">
+            <svg
+              id="gridboard"
+              viewBox="0 0 704 528"
+              aria-label="A grid of points deforming under a transformation"
+            >
+              <g id="a-ghost" class="ghost"></g>
+              <g id="a-ghostdots" class="ghost"></g>
+              <g id="a-lines"></g>
+              <g id="a-dots"></g>
+              <g id="a-basis"></g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>Transformation</h2>
+          <div class="modes" id="a-modes">
+            <button type="button" data-mode="rotation" aria-pressed="true">
+              Rotation
+            </button>
+            <button type="button" data-mode="skew" aria-pressed="false">
+              Skew
+            </button>
+            <button type="button" data-mode="swirl" aria-pressed="false">
+              Swirl
+            </button>
+            <button type="button" data-mode="custom" aria-pressed="false">
+              Custom
+            </button>
+          </div>
+
+          <div class="control" id="a-param">
+            <div class="control-row">
+              <label for="a-p">Angle</label>
+              <output id="a-p-out">45°</output>
+            </div>
+            <input id="a-p" type="range" min="-180" max="180" step="5" value="45" />
+          </div>
+
+          <div class="control" id="a-customwrap" hidden>
+            <div class="control-row"><label>Matrix entries</label></div>
+            <div class="matrix">
+              <input id="c00" type="number" step="0.1" value="1.2" aria-label="row 1 column 1" />
+              <input id="c01" type="number" step="0.1" value="0.8" aria-label="row 1 column 2" />
+              <input id="c10" type="number" step="0.1" value="-0.6" aria-label="row 2 column 1" />
+              <input id="c11" type="number" step="0.1" value="1" aria-label="row 2 column 2" />
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="control-row">
+              <label for="a-t">Amount</label>
+              <output id="a-t-out">1.00</output>
+            </div>
+            <input id="a-t" type="range" min="0" max="1" step="0.01" value="1" />
+          </div>
+
+          <div class="btnrow">
+            <button class="btn" id="a-play" type="button">Animate</button>
+            <button class="btn" id="a-reset" type="button">Reset</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>What it does</h2>
+          <div id="a-matrix-wrap">
+            <div class="matrix">
+              <span id="m00">1.00</span><span id="m01">0.00</span>
+              <span id="m10">0.00</span><span id="m11">1.00</span>
+            </div>
+            <div class="stats">
+              <span>determinant</span><span id="a-det">1.00</span>
+            </div>
+            <p class="note" id="a-detnote"></p>
+          </div>
+          <p class="note note--warn" id="a-nonlinear" hidden>
+            A swirl turns each point by an amount that depends on how far out it
+            sits, so straight grid lines come back curved. No 2×2 matrix can do
+            that — this one is not a linear transformation, and it is here for
+            contrast.
+          </p>
+        </section>
+      </aside>
+    </div>
+
+    <div class="explainer page">
+      <section>
+        <h2>Every vector moves with the space</h2>
+        <p>
+          It is tempting to read a matrix as something you apply to one vector
+          at a time. The board above suggests a better picture: the
+          transformation happens to the plane itself, and individual vectors are
+          just along for the ride. Every dot moved, in step, under the same four
+          numbers.
+        </p>
+        <p>
+          A few things survive that motion no matter which matrix you pick. The
+          origin never moves, because M·0 = 0. Straight lines stay straight, and
+          lines through the origin stay lines through the origin. Parallel lines
+          stay parallel, and evenly spaced marks along a line stay evenly
+          spaced. Everything else — lengths, angles, areas, orientation — is
+          fair game.
+        </p>
+        <p>
+          Area, in particular, changes by a single fixed factor everywhere, and
+          that factor is the determinant. If it reads 2, every region comes out
+          twice as large. If it reads negative, the plane has been flipped over.
+          And if it reads zero, the two columns lie along the same line, the
+          plane has nowhere to spread out, and the whole thing collapses onto a
+          line — many different starting vectors landing on top of one another,
+          with no way back.
+        </p>
+        <p>
+          Put your own vectors into the plane below and watch where the same
+          matrix sends them. Click the left panel to place one, drag its tip to
+          move it, and read its image off the right.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="space-section">
+      <div class="pair">
+        <div>
+          <div class="plate">
+            <div class="board-wrap">
+              <svg
+                id="src"
+                viewBox="0 0 360 360"
+                aria-label="The original plane, where vectors are placed"
+              >
+                <g id="s-grid" class="ghost"></g>
+                <g id="s-vecs"></g>
+                <g id="s-handles"></g>
+              </svg>
+              <p class="hint" id="s-hint">Click to place a vector.</p>
+            </div>
+          </div>
+          <p class="fig-cap">original space</p>
+        </div>
+        <div>
+          <div class="plate">
+            <svg
+              id="dst"
+              viewBox="0 0 360 360"
+              aria-label="The same vectors after the transformation"
+            >
+              <g id="d-ghost" class="ghost"></g>
+              <g id="d-grid"></g>
+              <g id="d-vecs"></g>
+            </svg>
+          </div>
+          <p class="fig-cap">after M</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>The matrix</h2>
+          <div class="matrix">
+            <input id="b00" type="number" step="0.1" value="1" aria-label="row 1 column 1" />
+            <input id="b01" type="number" step="0.1" value="-0.5" aria-label="row 1 column 2" />
+            <input id="b10" type="number" step="0.1" value="0.5" aria-label="row 2 column 1" />
+            <input id="b11" type="number" step="0.1" value="1" aria-label="row 2 column 2" />
+          </div>
+          <div class="btnrow" id="b-presets">
+            <button class="btn" type="button" data-m="1,0,0,1">Identity</button>
+            <button class="btn" type="button" data-m="0,-1,1,0">Rotate 90°</button>
+            <button class="btn" type="button" data-m="1,1,0,1">Shear</button>
+            <button class="btn" type="button" data-m="1.5,0,0,0.5">Scale</button>
+            <button class="btn" type="button" data-m="1,0,0,-1">Reflect</button>
+            <button class="btn" type="button" data-m="1,2,0.5,1">Collapse</button>
+          </div>
+          <div class="stats">
+            <span>determinant</span><span id="b-det">1.25</span>
+          </div>
+          <p class="note note--warn" id="b-singular" hidden>
+            The determinant is zero: both columns point along one line, so the
+            whole plane lands on that line. Different vectors are now sharing a
+            destination.
+          </p>
+        </section>
+
+        <section class="panel">
+          <h2>Vectors</h2>
+          <ul class="vlist" id="b-list"></ul>
+          <p class="empty" id="b-empty">Click the left panel to add one.</p>
+          <div class="btnrow">
+            <button class="btn" id="b-add" type="button">+ Add vector</button>
+            <button class="btn" id="b-clear" type="button">Clear</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <section class="notes page">
+      <h2>Reading the boards</h2>
+      <p>
+        On the first board the pale grid is where the points started; the
+        coloured one is where they are now. Clay marks the image of every
+        horizontal line and sage the image of every vertical one, with the two
+        axes drawn heavier and the images of <span class="sym">î</span> and
+        <span class="sym">ĵ</span> as solid arrows. Those two arrows are the
+        matrix — everything else on the board follows from them. The
+        <em>Amount</em> slider blends from doing nothing to doing the whole
+        transformation, which is a good way to see which parts of the plane
+        travel furthest.
+      </p>
+      <p>
+        <em>Swirl</em> is the odd one out, and deliberately so. It keeps the
+        origin fixed and it is perfectly well defined, but it turns distant
+        points more than nearby ones, so the grid lines come back bent. That
+        single failure — straight lines not staying straight — is enough to put
+        it outside the reach of any matrix. Fixing the origin is necessary for
+        linearity, not sufficient.
+      </p>
+      <p>
+        On the second board the two panels share a coordinate frame, so you can
+        compare positions directly: the faint grid on the right is where the
+        lines used to be, and the darker one is where they went. Try the
+        <em>Collapse</em> preset and drag a vector around the left panel — its
+        image slides up and down a single line and never leaves it, however far
+        you move the original. That is what a zero determinant costs you, and it
+        is why such a matrix cannot be undone.
+      </p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const $ = (id) => document.getElementById(id);
+        const CLAY = "#bf5b2e", SAGE = "#5f7161";
+        const SUB = "₀₁₂₃₄₅₆₇₈₉";
+        const sub = (n) => String(n).split("").map((d) => SUB[+d]).join("");
+        const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function arrow(x1, y1, x2, y2, color, w, opts) {
+          const o = opts || {};
+          const dx = x2 - x1, dy = y2 - y1;
+          const len = Math.hypot(dx, dy);
+          if (len < 1) return "";
+          const ux = dx / len, uy = dy / len;
+          const head = Math.min(o.head || 14, len * 0.5);
+          const hw = head * 0.4;
+          const bx = x2 - ux * head, by = y2 - uy * head;
+          const px = -uy, py = ux;
+          const op = o.opacity == null ? 1 : o.opacity;
+          const f = (n) => n.toFixed(1);
+          return (
+            `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux * 1.5)}" ` +
+            `y2="${f(by + uy * 1.5)}" stroke="${color}" stroke-width="${w}" ` +
+            `stroke-opacity="${op}" stroke-linecap="round"/>` +
+            `<path d="M${f(x2)},${f(y2)} L${f(bx + px * hw)},${f(by + py * hw)} ` +
+            `L${f(bx - px * hw)},${f(by - py * hw)} Z" fill="${color}" ` +
+            `fill-opacity="${op}"/>`
+          );
+        }
+
+        // Warm hues walked in an order that keeps consecutive picks apart, with
+        // the olive end run softer so it does not read as grass green.
+        const HUES = [18, 84, 40, 96, 28, 70, 12, 56];
+        let hueCursor = Math.floor(Math.random() * HUES.length);
+        function warmColor() {
+          const h = HUES[hueCursor++ % HUES.length] + (Math.random() * 8 - 4);
+          const olive = h > 62;
+          const s = olive ? 24 + Math.random() * 12 : 43 + Math.random() * 15;
+          const l = olive ? 33 + Math.random() * 8 : 38 + Math.random() * 10;
+          return `hsl(${h.toFixed(0)} ${s.toFixed(0)}% ${l.toFixed(0)}%)`;
+        }
+
+        /* ================= board one: the deforming grid ================= */
+
+        const AU = 40, AOX = 352, AOY = 264, LAT = 5;
+        const ax = (x) => AOX + AU * x;
+        const ay = (y) => AOY - AU * y;
+
+        const params = { rotation: 45, skew: 1, swirl: 0.25 };
+        const PARAM_META = {
+          rotation: { label: "Angle", min: -180, max: 180, step: 5, fmt: (v) => v + "°" },
+          skew: { label: "Skew k", min: -2, max: 2, step: 0.1, fmt: (v) => (+v).toFixed(1) },
+          swirl: { label: "Strength", min: -0.6, max: 0.6, step: 0.02, fmt: (v) => (+v).toFixed(2) },
+        };
+        let mode = "rotation";
+        let tAmt = 1;
+
+        const readCustom = () => [
+          Number($("c00").value) || 0, Number($("c01").value) || 0,
+          Number($("c10").value) || 0, Number($("c11").value) || 0,
+        ];
+
+        // The matrix actually on screen, part-way through the blend.
+        function matrixA() {
+          const t = tAmt;
+          if (mode === "rotation") {
+            const a = (t * params.rotation * Math.PI) / 180;
+            return [Math.cos(a), -Math.sin(a), Math.sin(a), Math.cos(a)];
+          }
+          if (mode === "skew") return [1, t * params.skew, 0, 1];
+          const m = readCustom();
+          return [
+            1 + t * (m[0] - 1), t * m[1],
+            t * m[2], 1 + t * (m[3] - 1),
+          ];
+        }
+
+        function applyA(x, y) {
+          if (mode === "swirl") {
+            const a = tAmt * params.swirl * Math.hypot(x, y);
+            const c = Math.cos(a), s = Math.sin(a);
+            return [c * x - s * y, s * x + c * y];
+          }
+          const M = matrixA();
+          return [M[0] * x + M[1] * y, M[2] * x + M[3] * y];
+        }
+
+        function buildAGhost() {
+          let s = "";
+          for (let i = -LAT; i <= LAT; i++) {
+            const cls = i === 0 ? ' class="ax"' : "";
+            s += `<line${cls} x1="${ax(i)}" y1="${ay(-LAT)}" x2="${ax(i)}" y2="${ay(LAT)}"/>`;
+            s += `<line${cls} x1="${ax(-LAT)}" y1="${ay(i)}" x2="${ax(LAT)}" y2="${ay(i)}"/>`;
+          }
+          $("a-ghost").innerHTML = s;
+          let d = "";
+          for (let i = -LAT; i <= LAT; i++)
+            for (let j = -LAT; j <= LAT; j++)
+              d += `<circle cx="${ax(i)}" cy="${ay(j)}" r="1.6"/>`;
+          $("a-ghostdots").innerHTML = d;
+        }
+
+        function drawA() {
+          // Straight lines only need their endpoints; a swirl needs enough
+          // samples to render the curve.
+          const n = mode === "swirl" ? 33 : 2;
+          const at = (k) => -LAT + (2 * LAT * k) / (n - 1);
+          let lines = "";
+          for (let i = -LAT; i <= LAT; i++) {
+            let a = [], b = [];
+            for (let k = 0; k < n; k++) {
+              const p = applyA(i, at(k));
+              a.push(`${ax(p[0]).toFixed(1)},${ay(p[1]).toFixed(1)}`);
+              const q = applyA(at(k), i);
+              b.push(`${ax(q[0]).toFixed(1)},${ay(q[1]).toFixed(1)}`);
+            }
+            lines += `<polyline class="${i === 0 ? "axis-j" : "fam-j"}" points="${a.join(" ")}"/>`;
+            lines += `<polyline class="${i === 0 ? "axis-i" : "fam-i"}" points="${b.join(" ")}"/>`;
+          }
+          $("a-lines").innerHTML = lines;
+
+          let dots = "";
+          for (let i = -LAT; i <= LAT; i++)
+            for (let j = -LAT; j <= LAT; j++) {
+              const p = applyA(i, j);
+              dots += `<circle cx="${ax(p[0]).toFixed(1)}" cy="${ay(p[1]).toFixed(1)}" r="2.6"/>`;
+            }
+          $("a-dots").innerHTML = dots;
+
+          // Drawn twice: a sand-coloured copy underneath lifts them clear of
+          // the lattice they sit on top of.
+          const pi = applyA(1, 0), pj = applyA(0, 1);
+          const pair = (p, c) =>
+            arrow(ax(0), ay(0), ax(p[0]), ay(p[1]), "var(--sand-100)", 6.5, { head: 17 }) +
+            arrow(ax(0), ay(0), ax(p[0]), ay(p[1]), c, 3.4, { head: 14 });
+          $("a-basis").innerHTML = pair(pi, CLAY) + pair(pj, SAGE);
+
+          readoutA();
+        }
+
+        function readoutA() {
+          const nonlinear = mode === "swirl";
+          $("a-matrix-wrap").hidden = nonlinear;
+          $("a-nonlinear").hidden = !nonlinear;
+          if (nonlinear) return;
+          const M = matrixA();
+          ["m00", "m01", "m10", "m11"].forEach((id, k) => {
+            $(id).textContent = M[k].toFixed(2);
+          });
+          const det = M[0] * M[3] - M[1] * M[2];
+          $("a-det").textContent = det.toFixed(2);
+          $("a-detnote").textContent =
+            Math.abs(det) < 1e-9
+              ? "Zero — the plane is being flattened onto a line."
+              : det < 0
+              ? `Areas scale by ${Math.abs(det).toFixed(2)} and the plane flips over.`
+              : `Every area comes out ${det.toFixed(2)}× its original size.`;
+        }
+
+        function setT(v) {
+          tAmt = v;
+          $("a-t").value = v;
+          $("a-t-out").textContent = v.toFixed(2);
+          drawA();
+        }
+
+        function setMode(next) {
+          mode = next;
+          document.querySelectorAll("#a-modes button").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b.dataset.mode === next));
+          });
+          const custom = next === "custom";
+          $("a-customwrap").hidden = !custom;
+          $("a-param").hidden = custom;
+          if (!custom) {
+            const meta = PARAM_META[next];
+            const el = $("a-p");
+            el.min = meta.min;
+            el.max = meta.max;
+            el.step = meta.step;
+            el.value = params[next];
+            $("a-param").querySelector("label").textContent = meta.label;
+            $("a-p-out").textContent = meta.fmt(params[next]);
+          }
+          drawA();
+        }
+
+        document.querySelectorAll("#a-modes button").forEach((b) => {
+          b.addEventListener("click", () => setMode(b.dataset.mode));
+        });
+        $("a-p").addEventListener("input", () => {
+          params[mode] = Number($("a-p").value);
+          $("a-p-out").textContent = PARAM_META[mode].fmt(params[mode]);
+          drawA();
+        });
+        ["c00", "c01", "c10", "c11"].forEach((id) => {
+          $(id).addEventListener("input", drawA);
+        });
+        $("a-t").addEventListener("input", () => setT(Number($("a-t").value)));
+        $("a-reset").addEventListener("click", () => setT(0));
+
+        let animId = null, animStop = null;
+        $("a-play").addEventListener("click", () => {
+          if (REDUCED) return setT(1);
+          cancelAnimationFrame(animId);
+          clearTimeout(animStop);
+          const dur = 1100, start = performance.now();
+          setT(0);
+          const step = (now) => {
+            const k = Math.min(1, (now - start) / dur);
+            // ease in and out, so the middle of the motion is the fastest part
+            const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+            setT(Math.round(e * 100) / 100);
+            if (k < 1) animId = requestAnimationFrame(step);
+          };
+          animId = requestAnimationFrame(step);
+          // A hidden tab throttles rAF to a standstill, which would strand the
+          // board at t = 0 showing nothing. Land it either way.
+          animStop = setTimeout(() => {
+            cancelAnimationFrame(animId);
+            setT(1);
+          }, dur + 400);
+        });
+
+        /* ============ board two: the same space, side by side ============ */
+
+        const BU = 32, BOX = 180, BOY = 180, BLIM = 5, BMAX = 5;
+        const bx = (x) => BOX + BU * x;
+        const by = (y) => BOY - BU * y;
+
+        let vecs = [];
+        let nextId = 1;
+
+        const readB = () => [
+          Number($("b00").value) || 0, Number($("b01").value) || 0,
+          Number($("b10").value) || 0, Number($("b11").value) || 0,
+        ];
+        const applyB = (M, x, y) => [M[0] * x + M[1] * y, M[2] * x + M[3] * y];
+
+        function gridMarkup(fn, cls) {
+          let s = "";
+          for (let i = -BLIM; i <= BLIM; i++) {
+            const a1 = fn(i, -BLIM), a2 = fn(i, BLIM);
+            const b1 = fn(-BLIM, i), b2 = fn(BLIM, i);
+            const k = i === 0 ? cls.axis : cls.line;
+            s += `<line class="${k.j}" x1="${a1[0].toFixed(1)}" y1="${a1[1].toFixed(1)}" ` +
+              `x2="${a2[0].toFixed(1)}" y2="${a2[1].toFixed(1)}"/>`;
+            s += `<line class="${k.i}" x1="${b1[0].toFixed(1)}" y1="${b1[1].toFixed(1)}" ` +
+              `x2="${b2[0].toFixed(1)}" y2="${b2[1].toFixed(1)}"/>`;
+          }
+          return s;
+        }
+
+        function buildBStatic() {
+          const plain = (x, y) => [bx(x), by(y)];
+          let s = "";
+          for (let i = -BLIM; i <= BLIM; i++) {
+            const cls = i === 0 ? ' class="ax"' : "";
+            s += `<line${cls} x1="${bx(i)}" y1="${by(-BLIM)}" x2="${bx(i)}" y2="${by(BLIM)}"/>`;
+            s += `<line${cls} x1="${bx(-BLIM)}" y1="${by(i)}" x2="${bx(BLIM)}" y2="${by(i)}"/>`;
+          }
+          $("s-grid").innerHTML = s;
+          $("d-ghost").innerHTML = s; // where the lines used to be
+        }
+
+        function drawB() {
+          const M = readB();
+          const det = M[0] * M[3] - M[1] * M[2];
+          $("b-det").textContent = det.toFixed(2);
+          $("b-singular").hidden = Math.abs(det) > 1e-9;
+
+          $("d-grid").innerHTML = gridMarkup(
+            (x, y) => {
+              const p = applyB(M, x, y);
+              return [bx(p[0]), by(p[1])];
+            },
+            { line: { i: "fam-i", j: "fam-j" }, axis: { i: "axis-i", j: "axis-j" } }
+          );
+
+          let sv = "", dv = "", hs = "";
+          vecs.forEach((v, k) => {
+            const name = "v" + sub(k + 1);
+            sv += arrow(bx(0), by(0), bx(v.x), by(v.y), v.color, 2.6, { head: 12 });
+            const len = Math.hypot(v.x, v.y) || 1;
+            const ox = (v.x / len) * 0.5, oy = (v.y / len) * 0.5;
+            sv += `<text class="vlabel" x="${clampX(bx(v.x + ox))}" ` +
+              `y="${clampY(by(v.y + oy))}" fill="${v.color}">${name}</text>`;
+
+            const p = applyB(M, v.x, v.y);
+            dv += arrow(bx(0), by(0), bx(p[0]), by(p[1]), v.color, 2.6, { head: 12 });
+            const pl = Math.hypot(p[0], p[1]) || 1;
+            dv += `<text class="vlabel" x="${clampX(bx(p[0] + (p[0] / pl) * 0.5))}" ` +
+              `y="${clampY(by(p[1] + (p[1] / pl) * 0.5))}" fill="${v.color}">${name}</text>`;
+
+            hs += `<circle class="handle" data-id="${v.id}" cx="${bx(v.x)}" cy="${by(v.y)}" ` +
+              `r="14" tabindex="0" role="button" aria-label="Drag ${name}"/>` +
+              `<circle class="handle-ring" cx="${bx(v.x)}" cy="${by(v.y)}" r="10" stroke="${v.color}"/>`;
+          });
+          $("s-vecs").innerHTML = sv;
+          $("d-vecs").innerHTML = dv;
+          $("s-handles").innerHTML = hs;
+          $("s-hint").hidden = vecs.length > 0;
+          listB(M);
+        }
+
+        const clampX = (x) => Math.max(12, Math.min(348, x)).toFixed(1);
+        const clampY = (y) => Math.max(12, Math.min(348, y)).toFixed(1);
+        const num = (n) =>
+          Number.isInteger(n) ? String(n) : (Math.round(n * 100) / 100).toFixed(2);
+
+        function listB(M) {
+          const list = $("b-list");
+          list.innerHTML = "";
+          vecs.forEach((v, k) => {
+            const p = applyB(M, v.x, v.y);
+            const li = document.createElement("li");
+            li.className = "vrow";
+            li.innerHTML =
+              `<span class="swatch" style="background:${v.color}"></span>` +
+              `<span class="vname">v${sub(k + 1)}</span>` +
+              `<span>(${v.x}, ${v.y})</span>` +
+              `<button class="icon-btn" type="button" aria-label="Delete v${sub(k + 1)}">×</button>` +
+              `<span class="img">→ (${num(p[0])}, ${num(p[1])})</span>`;
+            li.querySelector("button").addEventListener("click", () => {
+              vecs = vecs.filter((w) => w.id !== v.id);
+              drawB();
+            });
+            list.appendChild(li);
+          });
+          $("b-empty").hidden = vecs.length > 0;
+          $("b-add").disabled = vecs.length >= BMAX;
+        }
+
+        const occupied = (x, y) => vecs.some((v) => v.x === x && v.y === y);
+
+        function addVec(x, y) {
+          if (vecs.length >= BMAX || (x === 0 && y === 0) || occupied(x, y)) return;
+          vecs.push({ id: nextId++, x: x, y: y, color: warmColor() });
+          drawB();
+        }
+
+        function freeSpot() {
+          const cand = [[2, 1], [-1, 2], [1, -2], [3, 2], [-2, -1], [-3, 1]];
+          for (const [x, y] of cand) if (!occupied(x, y)) return [x, y];
+          for (let r = 1; r <= BLIM; r++)
+            for (let x = -r; x <= r; x++)
+              for (let y = -r; y <= r; y++)
+                if ((x || y) && !occupied(x, y)) return [x, y];
+          return [1, 1];
+        }
+
+        const srcSvg = $("src");
+        function toSrc(evt) {
+          const r = srcSvg.getBoundingClientRect();
+          const k = 360 / r.width;
+          return { x: (evt.clientX - r.left) * k, y: (evt.clientY - r.top) * k };
+        }
+        function snap(p) {
+          return {
+            x: Math.max(-BLIM, Math.min(BLIM, Math.round((p.x - BOX) / BU))),
+            y: Math.max(-BLIM, Math.min(BLIM, Math.round((BOY - p.y) / BU))),
+          };
+        }
+
+        let dragId = null, downAt = null;
+
+        srcSvg.addEventListener("pointerdown", (e) => {
+          const h = e.target.closest(".handle");
+          if (h) {
+            dragId = Number(h.dataset.id);
+            h.setPointerCapture(e.pointerId);
+            e.preventDefault();
+            return;
+          }
+          downAt = { x: e.clientX, y: e.clientY };
+        });
+        srcSvg.addEventListener("pointermove", (e) => {
+          if (dragId == null) return;
+          const v = vecs.find((w) => w.id === dragId);
+          if (!v) return;
+          const p = snap(toSrc(e));
+          if (p.x === v.x && p.y === v.y) return;
+          v.x = p.x;
+          v.y = p.y;
+          drawB();
+        });
+        srcSvg.addEventListener("pointerup", (e) => {
+          if (dragId != null) {
+            dragId = null;
+            downAt = null;
+            return;
+          }
+          if (!downAt) return;
+          const moved = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y);
+          downAt = null;
+          if (moved > 5) return;
+          const p = snap(toSrc(e));
+          addVec(p.x, p.y);
+        });
+        srcSvg.addEventListener("pointercancel", () => (dragId = null));
+
+        srcSvg.addEventListener("keydown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          const d = {
+            ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+            ArrowUp: [0, 1], ArrowDown: [0, -1],
+          }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const id = Number(h.dataset.id);
+          const v = vecs.find((w) => w.id === id);
+          if (!v) return;
+          v.x = Math.max(-BLIM, Math.min(BLIM, v.x + d[0]));
+          v.y = Math.max(-BLIM, Math.min(BLIM, v.y + d[1]));
+          drawB();
+          const again = $("s-handles").querySelector(`.handle[data-id="${id}"]`);
+          if (again) again.focus();
+        });
+
+        ["b00", "b01", "b10", "b11"].forEach((id) => {
+          $(id).addEventListener("input", drawB);
+        });
+        document.querySelectorAll("#b-presets button").forEach((b) => {
+          b.addEventListener("click", () => {
+            const m = b.dataset.m.split(",");
+            ["b00", "b01", "b10", "b11"].forEach((id, k) => ($(id).value = m[k]));
+            drawB();
+          });
+        });
+        $("b-add").addEventListener("click", () => addVec(...freeSpot()));
+        $("b-clear").addEventListener("click", () => {
+          vecs = [];
+          drawB();
+        });
+
+        /* ------------------------------ go ------------------------------ */
+        buildAGhost();
+        setMode("rotation");
+        buildBStatic();
+        addVec(2, 1);
+        addVec(-1, 2);
+      })();
+    </script>
+  </body>
+</html>

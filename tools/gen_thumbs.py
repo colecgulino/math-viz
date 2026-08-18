@@ -88,6 +88,50 @@ def dotproduct():
     )
 
 
+# ------------------------------------------------- linear transformations
+def transformation():
+    """A square lattice with its sheared image laid over the top."""
+    u, ox, oy = 22.0, 160.0, 80.0
+    M = (1.15, 0.75, -0.5, 0.95)
+
+    def G(x, y):
+        return (ox + u * x, oy - u * y)
+
+    def T(x, y):
+        return G(M[0] * x + M[1] * y, M[2] * x + M[3] * y)
+
+    body = []
+    for i in range(-4, 5):  # the starting grid, pale
+        body.append(line(G(i, -4), G(i, 4), P["sand400"], 1.0))
+        body.append(line(G(-4, i), G(4, i), P["sand400"], 1.0))
+    for i in range(-4, 5):  # and where it ends up
+        axis = i == 0
+        body.append(
+            line(T(i, -4), T(i, 4), P["sage"], 2.0 if axis else 1.1,
+                 0.9 if axis else 0.4)
+        )
+        body.append(
+            line(T(-4, i), T(4, i), P["clay"], 2.0 if axis else 1.1,
+                 0.9 if axis else 0.4)
+        )
+    for i in range(-4, 5):
+        for j in range(-4, 5):
+            x, y = T(i, j)
+            if 6 < x < 314 and 4 < y < 156:
+                body.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.9" fill="{P["umber"]}"/>')
+    body.append(arrow(G(0, 0), T(1, 0), P["clay"], 2.4, head_max=9))
+    body.append(arrow(G(0, 0), T(0, 1), P["sage"], 2.4, head_max=9))
+
+    write_svg(
+        "assets/thumbs/transformation.svg",
+        svg_doc(
+            W, H, body, "A square grid and its sheared image",
+            background=P["plate"], clip_id="plate",
+        ),
+    )
+
+
 if __name__ == "__main__":
     lincomb()
     dotproduct()
+    transformation()
