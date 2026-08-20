@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160" width="320" height="160" role="img" aria-label="A line through the origin inside the plane">
+  <rect width="320" height="160" fill="#e6d9c4"/>
+  <defs><clipPath id="plate"><rect width="320" height="160"/></clipPath></defs>
+  <g clip-path="url(#plate)">
+  <polyline points="4.0,158.0 4.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="30.0,158.0 30.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="56.0,158.0 56.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="82.0,158.0 82.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="108.0,158.0 108.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="134.0,158.0 134.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="160.0,158.0 160.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="186.0,158.0 186.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="212.0,158.0 212.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="238.0,158.0 238.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="264.0,158.0 264.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="290.0,158.0 290.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="316.0,158.0 316.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,158.0 316.0,158.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,132.0 316.0,132.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,106.0 316.0,106.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,80.0 316.0,80.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,54.0 316.0,54.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,28.0 316.0,28.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,2.0 316.0,2.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="4.0,80.0 316.0,80.0" fill="none" stroke="#9c8f7c" stroke-width="1.2" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="160.0,158.0 160.0,2.0" fill="none" stroke="#9c8f7c" stroke-width="1.2" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="19.6,150.2 300.4,9.8" fill="none" stroke="#bf5b2e" stroke-width="13" stroke-opacity="0.16" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="19.6,150.2 300.4,9.8" fill="none" stroke="#bf5b2e" stroke-width="1.4" stroke-opacity="0.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5"/>
+  <polyline points="160.0,80.0 204.0,58.0" fill="none" stroke="#bf5b2e" stroke-width="2.4" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M212.0,54.0 L205.0,62.4 L201.1,54.5 Z" fill="#bf5b2e" fill-opacity="1.0"/>
+  <polyline points="212.0,54.0 256.0,32.0" fill="none" stroke="#5f7161" stroke-width="2.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M264.0,28.0 L257.0,36.4 L253.1,28.5 Z" fill="#5f7161" fill-opacity="1.0"/>
+  <circle cx="160.0" cy="80.0" r="3.4" fill="#2f2a25"/>
+  </g>
+</svg>

@@ -309,6 +309,66 @@ def transform_after():
     )
 
 
+# ----------------------------------------------------------- vector spaces
+SU, SOX, SOY = 34, 182, 210
+
+
+def SV(x, y):
+    return (SOX + SU * x, SOY - SU * y)
+
+
+def subspace_closed():
+    """A line through the origin: add two of its members, stay on it."""
+    body = plate_at(SU, SOX, SOY, (-5, 5), (-2, 4))
+    body.append(line(SV(-2.7, -2.7), SV(3.7, 3.7), P["ochre"], 5, 0.3))
+    body.append(line(SV(-2.7, -2.7), SV(3.7, 3.7), P["ochre"], 1.4, 0.85, dash="6 5"))
+
+    # u, v and their sum all lie on the same line, so the sum goes underneath
+    # as a band — drawn as an arrow it would simply cover the other two.
+    body.append(halo(SV(0, 0), SV(3, 3), P["ink900"], 11, 0.2))
+    body.append(arrow(SV(0, 0), SV(1, 1), P["clay"], 2.8))
+    body.append(arrow(SV(1, 1), SV(3, 3), P["sage"], 2.8))
+    body.append(f'<circle cx="{SV(0, 0)[0]}" cy="{SV(0, 0)[1]}" r="4" fill="{P["ink900"]}"/>')
+
+    body.append(text(*SV(0.9, 0.2), "u", P["clay"], 15, "serif", italic=True, boxed=BG))
+    body.append(text(*SV(2.6, 1.5), "v", P["sage"], 15, "serif", italic=True, boxed=BG))
+    body.append(text(*SV(1.0, 2.6), "u + v", P["ink900"], 13, boxed=BG))
+    body.append(text(*SV(-1.9, -0.9), "W", P["ochre"], 15, "serif", italic=True, boxed=BG))
+
+    write_svg(
+        "assets/figures/subspace-closed.svg",
+        svg_doc(PW, PH, body, "A line through the origin, closed under addition"),
+    )
+
+
+def subspace_open():
+    """A line that misses the origin: add two of its members, leave it."""
+    body = plate_at(SU, SOX, SOY, (-5, 5), (-2, 4))
+    body.append(line(SV(-4.4, 2), SV(4.4, 2), P["ochre"], 5, 0.3))
+    body.append(line(SV(-4.4, 2), SV(4.4, 2), P["ochre"], 1.4, 0.85, dash="6 5"))
+
+    body.append(arrow(SV(0, 0), SV(-3, 2), P["clay"], 2.8))
+    body.append(arrow(SV(-3, 2), SV(-1, 4), P["sage"], 2.8))
+    body.append(arrow(SV(0, 0), SV(-1, 4), P["ink900"], 3.0, head_max=13))
+    body.append(f'<circle cx="{SV(0, 0)[0]}" cy="{SV(0, 0)[1]}" r="4" fill="{P["ink900"]}"/>')
+    # the sum sits off the line, so ring it and drop a thread back down
+    body.append(line(SV(-1, 4), SV(-1, 2), P["ink400"], 1.2, 0.75, dash="3 4"))
+    body.append(
+        f'<circle cx="{SV(-1, 4)[0]}" cy="{SV(-1, 4)[1]}" r="9" fill="none" '
+        f'stroke="{P["clay"]}" stroke-width="1.6"/>'
+    )
+
+    body.append(text(*SV(-2.1, 0.6), "u", P["clay"], 15, "serif", italic=True, boxed=BG))
+    body.append(text(*SV(-2.6, 3.2), "v", P["sage"], 15, "serif", italic=True, boxed=BG))
+    body.append(text(*SV(0.7, 4.1), "u + v", P["ink900"], 13, boxed=BG))
+    body.append(text(*SV(3.3, 2.7), "W", P["ochre"], 15, "serif", italic=True, boxed=BG))
+
+    write_svg(
+        "assets/figures/subspace-open.svg",
+        svg_doc(PW, PH, body, "A line missing the origin, where a sum of two members escapes"),
+    )
+
+
 def plate_at(u, ox, oy, cells_x, cells_y):
     """plate() with a custom scale and origin."""
     out = [
@@ -339,3 +399,5 @@ if __name__ == "__main__":
     triangle_equality()
     transform_before()
     transform_after()
+    subspace_closed()
+    subspace_open()

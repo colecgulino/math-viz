@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vector Spaces and Subspaces — math-viz</title>
+    <meta
+      name="description"
+      content="The abstract definition of a vector space, all eight axioms, and what a subspace has to satisfy."
+    />
+    <link rel="stylesheet" href="../../assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* ---- explainer prose ---- */
+      .jump {
+        display: inline-block;
+        margin-top: 18px;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .jump:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .explainer {
+        padding-block: 10px 6px;
+      }
+      .explainer > section + section {
+        margin-top: 46px;
+      }
+      .explainer h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+      }
+      .explainer h3 {
+        font-size: 1.02rem;
+        margin: 30px 0 12px;
+        color: var(--clay-600);
+      }
+      .explainer p {
+        max-width: var(--measure);
+        margin: 0 0 17px;
+      }
+      .explainer figure {
+        margin: 26px 0 28px;
+        max-width: 800px;
+      }
+      .explainer figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .two-up {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+      }
+      .two-up figcaption {
+        grid-column: 1 / -1;
+      }
+      .fig-cap {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-500);
+        text-align: center;
+        margin: 12px 0 0 !important;
+      }
+      .explainer figcaption {
+        max-width: var(--measure);
+        margin-top: 14px;
+        font-size: 0.86rem;
+        color: var(--ink-400);
+      }
+      .sym {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-900);
+      }
+      .calc {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        line-height: 1.9;
+        color: var(--ink-900);
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        max-width: var(--measure);
+        overflow-x: auto;
+      }
+      .calc .muted {
+        color: var(--ink-400);
+      }
+      @media (max-width: 660px) {
+        .two-up {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+      }
+
+      /* ---- the axiom list ---- */
+      /* `display: grid` on an li removes its list-item display and with it
+         the ::marker, so the numbering runs off a counter instead. */
+      .axioms,
+      .tests {
+        max-width: var(--measure);
+        margin: 0 0 22px;
+        padding: 20px 22px;
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        list-style: none;
+        counter-reset: ax;
+      }
+      .axioms--from5 {
+        counter-reset: ax 4;
+      }
+      .axioms li,
+      .tests li {
+        counter-increment: ax;
+        display: grid;
+        grid-template-columns: 24px 188px 1fr;
+        gap: 3px 14px;
+        align-items: baseline;
+        margin-bottom: 13px;
+      }
+      .axioms li:last-child,
+      .tests li:last-child {
+        margin-bottom: 0;
+      }
+      .axioms li::before,
+      .tests li::before {
+        content: counter(ax) ".";
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--clay-600);
+      }
+      .ax-name {
+        font-family: var(--font-mono);
+        font-size: 0.73rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-400);
+      }
+      .ax-eq {
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        color: var(--ink-900);
+      }
+      .group-head {
+        font-family: var(--font-mono);
+        font-size: 0.73rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--clay-600);
+        margin: 0 0 10px;
+      }
+      .group-head + .axioms {
+        margin-top: 0;
+      }
+      @media (max-width: 620px) {
+        .axioms li,
+        .tests li {
+          grid-template-columns: 24px 1fr;
+        }
+        .ax-eq {
+          grid-column: 2;
+        }
+      }
+
+      /* ---- board ---- */
+      .board-wrap {
+        position: relative;
+      }
+      #board {
+        touch-action: none;
+        cursor: crosshair;
+      }
+      #grid line {
+        stroke: var(--grid-line);
+        stroke-width: 1;
+      }
+      #axes .axis {
+        stroke: var(--axis-line);
+        stroke-width: 1.4;
+      }
+      .tick {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+      }
+      .vlabel {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 16px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+      }
+      .spanlabel {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        fill: var(--clay-600);
+        pointer-events: none;
+      }
+      .handle {
+        fill: transparent;
+        cursor: grab;
+      }
+      .handle:active {
+        cursor: grabbing;
+      }
+      .handle-ring {
+        fill: none;
+        stroke-width: 1.5;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 110ms ease;
+      }
+      .handle:hover + .handle-ring,
+      .handle:focus-visible + .handle-ring {
+        opacity: 0.55;
+      }
+      .hint {
+        position: absolute;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        margin: 0;
+        font-size: 0.84rem;
+        color: var(--ink-400);
+        background: rgba(246, 239, 227, 0.92);
+        border: var(--border);
+        border-radius: 999px;
+        padding: 5px 14px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .hint[hidden] {
+        display: none;
+      }
+
+      /* ---- panels ---- */
+      .vlist {
+        list-style: none;
+        margin: 0 0 12px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .vrow {
+        display: grid;
+        grid-template-columns: 12px 26px 1fr 1fr 24px;
+        align-items: center;
+        gap: 7px;
+      }
+      .swatch {
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+      }
+      .vname {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--ink-900);
+      }
+      .icon-btn {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        font-size: 1rem;
+        color: var(--ink-400);
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: color 120ms ease, border-color 120ms ease;
+      }
+      .icon-btn:hover {
+        color: var(--clay-600);
+        border-color: var(--clay-200);
+      }
+      .icon-btn:focus-visible {
+        outline: 2px solid var(--clay-500);
+        outline-offset: 1px;
+      }
+      .empty {
+        font-size: 0.86rem;
+        color: var(--ink-400);
+        margin: 0 0 12px;
+      }
+      .empty[hidden] {
+        display: none;
+      }
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .verdict {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        color: var(--ink-900);
+        margin: 0 0 6px;
+      }
+      .verdict-sub {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        margin: 0 0 14px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        border-top: var(--border);
+        padding-top: 13px;
+      }
+      .stats span:nth-child(even) {
+        color: var(--ink-900);
+        text-align: right;
+      }
+      .note {
+        font-size: 0.84rem;
+        color: var(--ink-500);
+        line-height: 1.55;
+        margin: 13px 0 0;
+        border-top: var(--border);
+        padding-top: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topbar page"><a href="../../">&larr; Index</a></nav>
+
+    <header class="intro page">
+      <h1>Vector Spaces and Subspaces</h1>
+      <p>
+        Everything so far has been about arrows on a grid. None of it needed to
+        be. The arguments only ever used two operations and a handful of rules
+        those operations obey, so anything else satisfying the same rules
+        inherits the same results. Writing down exactly what those rules are is
+        what turns a picture into a definition.
+      </p>
+      <a class="jump" href="#span-section">Skip to the board &darr;</a>
+    </header>
+
+    <div class="explainer page">
+      <section>
+        <h2>The definition</h2>
+        <p>
+          Stop asking what a vector <em>is</em> and start asking what it has to
+          <em>do</em>. A vector space is not a kind of object; it is a set
+          together with two operations that behave in a specified way. The
+          elements are then called vectors by definition — not because they look
+          like arrows.
+        </p>
+
+        <h3>The ingredients</h3>
+        <p>
+          A vector space consists of a set
+          <span class="sym">V</span>, whose elements are called
+          <strong>vectors</strong>, and a field
+          <span class="sym">F</span>, whose elements are called
+          <strong>scalars</strong>, equipped with two operations:
+        </p>
+        <div class="calc">
+          addition &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + : V × V → V<br />
+          scalar multiplication &nbsp;· : F × V → V
+        </div>
+        <p>
+          Those two arrows are doing real work. Writing "+ : V × V → V" says
+          that adding two vectors produces something still in
+          <span class="sym">V</span>, and likewise that scaling a vector keeps
+          you inside <span class="sym">V</span>. That property is called
+          <strong>closure</strong>, and it is the first thing to fail when a set
+          turns out not to be a vector space.
+        </p>
+        <p>
+          The field <span class="sym">F</span> is almost always the real numbers
+          here. It can be the complex numbers, the rationals, or a finite field
+          instead, and the choice matters: the same set of objects over a
+          different field is a different vector space.
+        </p>
+
+        <h3>The eight axioms</h3>
+        <p>
+          For all <span class="sym">u</span>, <span class="sym">v</span>,
+          <span class="sym">w</span> in <span class="sym">V</span> and all
+          <span class="sym">a</span>, <span class="sym">b</span> in
+          <span class="sym">F</span>:
+        </p>
+
+        <p class="group-head">How addition behaves</p>
+        <ol class="axioms">
+          <li>
+            <span class="ax-name">associativity</span>
+            <span class="ax-eq">(u + v) + w = u + (v + w)</span>
+          </li>
+          <li>
+            <span class="ax-name">commutativity</span>
+            <span class="ax-eq">u + v = v + u</span>
+          </li>
+          <li>
+            <span class="ax-name">additive identity</span>
+            <span class="ax-eq">there is a 0 ∈ V with v + 0 = v</span>
+          </li>
+          <li>
+            <span class="ax-name">additive inverse</span>
+            <span class="ax-eq">each v has a −v ∈ V with v + (−v) = 0</span>
+          </li>
+        </ol>
+
+        <p class="group-head">How scaling behaves</p>
+        <ol class="axioms axioms--from5" start="5">
+          <li>
+            <span class="ax-name">compatibility</span>
+            <span class="ax-eq">a(bv) = (ab)v</span>
+          </li>
+          <li>
+            <span class="ax-name">scalar identity</span>
+            <span class="ax-eq">1v = v, for the 1 of F</span>
+          </li>
+          <li>
+            <span class="ax-name">distributive over V</span>
+            <span class="ax-eq">a(u + v) = au + av</span>
+          </li>
+          <li>
+            <span class="ax-name">distributive over F</span>
+            <span class="ax-eq">(a + b)v = av + bv</span>
+          </li>
+        </ol>
+
+        <p>
+          That is the complete list. Together with closure it is everything a
+          vector space is required to be, and every theorem in linear algebra is
+          built from it and nothing else.
+        </p>
+        <p>
+          Two things worth noticing. The first four axioms say precisely that
+          <span class="sym">V</span> under addition is an
+          <em>abelian group</em> — the rest is about how the scalars interact
+          with it. And a number of familiar facts are deliberately
+          <em>absent</em>: nothing here mentions length, angle, distance, or
+          perpendicularity. Those arrive only when you add a
+          <a href="../dot-products/">dot product</a> on top, which is extra
+          structure, not part of the definition.
+        </p>
+        <p>
+          Some facts that look like axioms are not, because they follow from the
+          ones above: the zero vector is unique, each inverse is unique,
+          0<span class="sym">v</span> = <strong>0</strong>,
+          <span class="sym">a</span><strong>0</strong> = <strong>0</strong>, and
+          (−1)<span class="sym">v</span> = −<span class="sym">v</span>. Short
+          derivations, all of them, and a good sign the list is not padded.
+        </p>
+      </section>
+
+      <section>
+        <h2>What ends up qualifying</h2>
+        <p>
+          The payoff for the abstraction is how much it catches. All of these
+          are vector spaces over the reals, and every result proved from the
+          eight axioms applies to all of them at once:
+        </p>
+        <div class="calc">
+          ℝⁿ <span class="muted">&nbsp;— tuples of n real numbers</span><br />
+          polynomials of degree ≤ n<br />
+          m × n matrices<br />
+          continuous functions on an interval<br />
+          infinite sequences of reals<br />
+          solutions of a homogeneous linear differential equation
+        </div>
+        <p>
+          Functions are the case worth dwelling on. Add two functions and you
+          get a function; scale one and you get a function; the zero function
+          plays the role of <strong>0</strong>; and all eight axioms check out
+          pointwise. So a space of functions is a vector space in exactly the
+          sense the definition intends, and talk of a "basis of functions" or
+          "the dimension of a function space" is not a metaphor.
+        </p>
+        <p>
+          Non-examples are just as instructive. Vectors in the plane with
+          strictly positive entries are not a vector space: scaling by −1 leaves
+          the set, and there is no zero. Neither are the invertible 2×2
+          matrices — adding two of them can easily produce a singular one, so
+          closure fails.
+        </p>
+      </section>
+
+      <section>
+        <h2>Subspaces</h2>
+        <p>
+          A <strong>subspace</strong> of <span class="sym">V</span> is a subset
+          <span class="sym">W</span> ⊆ <span class="sym">V</span> that is itself
+          a vector space, using the same two operations it inherits from
+          <span class="sym">V</span>. A space living inside a space.
+        </p>
+        <p>
+          Checking that against the full definition would mean verifying eight
+          axioms all over again. You never have to. Associativity,
+          commutativity and the distributive laws are statements that hold for
+          <em>all</em> elements of <span class="sym">V</span>, so they
+          automatically hold for any elements you select out of it. Those
+          axioms are inherited for free. The only way a subset can fail is by
+          leaking — by containing elements whose sum or whose multiples fall
+          outside it. Which leaves three things to check:
+        </p>
+
+        <ol class="tests">
+          <li>
+            <span class="ax-name">contains zero</span>
+            <span class="ax-eq">0 ∈ W</span>
+          </li>
+          <li>
+            <span class="ax-name">closed under addition</span>
+            <span class="ax-eq">u, v ∈ W ⟹ u + v ∈ W</span>
+          </li>
+          <li>
+            <span class="ax-name">closed under scaling</span>
+            <span class="ax-eq">a ∈ F, v ∈ W ⟹ av ∈ W</span>
+          </li>
+        </ol>
+
+        <p>
+          Additive inverses come along for the ride: if
+          <span class="sym">v</span> ∈ <span class="sym">W</span> then
+          (−1)<span class="sym">v</span> = −<span class="sym">v</span> is in
+          <span class="sym">W</span> by the third condition. And the first
+          condition can be weakened to "<span class="sym">W</span> is not
+          empty", since scaling any member by 0 produces
+          <strong>0</strong>. It is usually stated as
+          <strong>0</strong> ∈ <span class="sym">W</span> because that is the
+          fastest thing to check and the most common way a candidate fails.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/subspace-closed.svg"
+              alt="A line through the origin, with two of its vectors adding to a third that is still on the line."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">a line through the origin</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/subspace-open.svg"
+              alt="A line that misses the origin, where the sum of two of its vectors lands off the line."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">a line that misses it</p>
+          </div>
+          <figcaption>
+            Both are lines. Only the left one is a subspace — on the right, two
+            members add to something that is not a member, and the origin is
+            missing besides.
+          </figcaption>
+        </figure>
+
+        <p>
+          That is why "through the origin" appears in every description of a
+          subspace. Shift a line off the origin and it stops being closed under
+          addition at the same moment it stops containing
+          <strong>0</strong>. Such a set is still perfectly useful — it is
+          called an <em>affine</em> subspace, and it is what the solution set of
+          an inhomogeneous system looks like — but it is not a vector space.
+        </p>
+
+        <h3>The complete list for the plane</h3>
+        <p>
+          In ℝ² there are exactly three kinds of subspace, and no others:
+          the single point <strong>{0}</strong>, any line through the origin,
+          and ℝ² itself. In ℝ³ you also get planes through the origin. In every
+          case the dimension of the subspace is 0, 1, 2, and so on up to the
+          dimension of the whole space.
+        </p>
+        <p>
+          These are exactly the
+          <a href="../linear-combinations/">spans</a> of sets of vectors. Take
+          any collection of vectors and the set of all their linear combinations
+          is automatically a subspace — it contains
+          <strong>0</strong> (take every coefficient zero), sums of combinations
+          are combinations, and scaled combinations are combinations. Going the
+          other way, every subspace is the span of some set of vectors. Span and
+          subspace describe the same objects, built up from generators or
+          carved out by conditions.
+        </p>
+        <p>
+          The board below builds spans directly. Place up to three vectors and
+          watch which subspace they generate.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="span-section">
+      <div class="plate">
+        <div class="board-wrap">
+          <svg
+            id="board"
+            viewBox="0 0 704 528"
+            aria-label="Vectors on a grid with the subspace they span"
+          >
+            <g id="span"></g>
+            <g id="grid"></g>
+            <g id="axes"></g>
+            <g id="vectors"></g>
+            <g id="handles"></g>
+          </svg>
+          <p class="hint" id="hint">Click anywhere to place a vector.</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>Vectors</h2>
+          <ul class="vlist" id="glossary"></ul>
+          <p class="empty" id="empty">None yet.</p>
+          <div class="btnrow">
+            <button class="btn" id="add" type="button">+ Add vector</button>
+            <button class="btn" id="clear" type="button">Clear</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>The span</h2>
+          <p class="verdict" id="verdict"></p>
+          <p class="verdict-sub" id="verdict-sub"></p>
+          <div class="stats">
+            <span>dimension</span><span id="dim">0</span>
+          </div>
+          <p class="note" id="note"></p>
+        </section>
+      </aside>
+    </div>
+
+    <section class="notes page">
+      <h2>Reading the board</h2>
+      <p>
+        The tinted region is the span — every vector you could reach by scaling
+        the ones you placed and adding the results. With nothing placed, or with
+        everything sitting at the origin, the only reachable point is the origin
+        itself, and the span is the zero subspace. One vector, or several
+        pointing along a common line, reaches that whole line and nothing else.
+        Two vectors in genuinely different directions reach the entire plane.
+      </p>
+      <p>
+        The moment to watch for is the collapse. Set up two vectors that span
+        the plane, then drag one until it lines up with the other: the tint
+        drops from the full plane to a single line, and the dimension falls from
+        2 to 1. Nothing about either vector changed except its direction, and
+        yet the set of reachable points went from infinite in two directions to
+        infinite in only one. This is linear dependence, and it is the same
+        collapse a
+        <a href="../linear-transformations/">zero determinant</a> produces —
+        there, the image of the whole plane is a line, and that line is a
+        subspace generated by the columns of the matrix.
+      </p>
+      <p>
+        Notice also what you cannot make the board do. There is no way to
+        arrange vectors so the span is a line that misses the origin, or a
+        disc, or a half-plane. The span of any set is always a subspace, because
+        it is built out of exactly the operations a subspace has to be closed
+        under.
+      </p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const U = 44, OX = 352, OY = 264;
+        const XMIN = -8, XMAX = 8, YMIN = -6, YMAX = 6;
+        const MAX_VECTORS = 3;
+
+        const sx = (x) => OX + U * x;
+        const sy = (y) => OY - U * y;
+        const lx = (x) => Math.max(14, Math.min(690, x));
+        const ly = (y) => Math.max(13, Math.min(517, y));
+        const $ = (id) => document.getElementById(id);
+        const board = $("board");
+
+        const SUB = "₀₁₂₃₄₅₆₇₈₉";
+        const sub = (n) => String(n).split("").map((d) => SUB[+d]).join("");
+
+        let vectors = [];
+        let nextId = 1;
+
+        const HUES = [18, 84, 40, 96, 28, 70, 12, 56];
+        let hueCursor = Math.floor(Math.random() * HUES.length);
+        function warmColor() {
+          const h = HUES[hueCursor++ % HUES.length] + (Math.random() * 8 - 4);
+          const olive = h > 62;
+          const s = olive ? 24 + Math.random() * 12 : 43 + Math.random() * 15;
+          const l = olive ? 33 + Math.random() * 8 : 38 + Math.random() * 10;
+          return `hsl(${h.toFixed(0)} ${s.toFixed(0)}% ${l.toFixed(0)}%)`;
+        }
+
+        function arrow(x1, y1, x2, y2, color, w) {
+          const dx = x2 - x1, dy = y2 - y1;
+          const len = Math.hypot(dx, dy);
+          if (len < 1) return "";
+          const ux = dx / len, uy = dy / len;
+          const head = Math.min(14, len * 0.5);
+          const hw = head * 0.4;
+          const bx = x2 - ux * head, by = y2 - uy * head;
+          const px = -uy, py = ux;
+          const f = (n) => n.toFixed(1);
+          return (
+            `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux * 1.5)}" ` +
+            `y2="${f(by + uy * 1.5)}" stroke="${color}" stroke-width="${w}" ` +
+            `stroke-linecap="round"/>` +
+            `<path d="M${f(x2)},${f(y2)} L${f(bx + px * hw)},${f(by + py * hw)} ` +
+            `L${f(bx - px * hw)},${f(by - py * hw)} Z" fill="${color}"/>`
+          );
+        }
+
+        function buildGrid() {
+          let g = "";
+          for (let x = XMIN; x <= XMAX; x++)
+            g += `<line x1="${sx(x)}" y1="${sy(YMIN)}" x2="${sx(x)}" y2="${sy(YMAX)}"/>`;
+          for (let y = YMIN; y <= YMAX; y++)
+            g += `<line x1="${sx(XMIN)}" y1="${sy(y)}" x2="${sx(XMAX)}" y2="${sy(y)}"/>`;
+          $("grid").innerHTML = g;
+
+          let a =
+            `<line class="axis" x1="${sx(XMIN)}" y1="${sy(0)}" x2="${sx(XMAX)}" y2="${sy(0)}"/>` +
+            `<line class="axis" x1="${sx(0)}" y1="${sy(YMIN)}" x2="${sx(0)}" y2="${sy(YMAX)}"/>`;
+          for (let x = XMIN + 2; x <= XMAX - 2; x += 2)
+            if (x !== 0)
+              a += `<text class="tick" x="${sx(x)}" y="${sy(0) + 17}">${x}</text>`;
+          for (let y = YMIN + 2; y <= YMAX - 2; y += 2)
+            if (y !== 0)
+              a += `<text class="tick" x="${sx(0) - 10}" y="${sy(y) + 4}" text-anchor="end">${y}</text>`;
+          $("axes").innerHTML = a;
+        }
+
+        // Rank of the placed vectors. Coordinates are integers, so the
+        // cross-product test for "all on one line" is exact — no epsilon.
+        function spanInfo() {
+          const nz = vectors.filter((v) => v.x !== 0 || v.y !== 0);
+          if (!nz.length) return { rank: 0 };
+          const base = nz[0];
+          const spread = nz.some((v) => base.x * v.y - base.y * v.x !== 0);
+          return spread ? { rank: 2 } : { rank: 1, dir: base };
+        }
+
+        function drawSpan(info) {
+          if (info.rank === 0) {
+            $("span").innerHTML =
+              `<circle cx="${sx(0)}" cy="${sy(0)}" r="7" fill="var(--clay-500)" ` +
+              `fill-opacity="0.35"/><circle cx="${sx(0)}" cy="${sy(0)}" r="3.5" ` +
+              `fill="var(--clay-500)"/>` +
+              `<text class="spanlabel" x="${sx(0) + 16}" y="${sy(0) - 12}">{ 0 }</text>`;
+            return;
+          }
+          if (info.rank === 1) {
+            const d = info.dir;
+            const n = Math.hypot(d.x, d.y);
+            const t = 40; // long enough to run past the board in both directions
+            const x1 = sx((-d.x / n) * t), y1 = sy((-d.y / n) * t);
+            const x2 = sx((d.x / n) * t), y2 = sy((d.y / n) * t);
+            $("span").innerHTML =
+              `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" ` +
+              `y2="${y2.toFixed(1)}" stroke="var(--clay-500)" stroke-width="16" ` +
+              `stroke-opacity="0.16" stroke-linecap="round"/>` +
+              `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" ` +
+              `y2="${y2.toFixed(1)}" stroke="var(--clay-500)" stroke-width="1.6" ` +
+              `stroke-opacity="0.75" stroke-dasharray="7 6"/>`;
+            return;
+          }
+          $("span").innerHTML =
+            `<rect x="0" y="0" width="704" height="528" fill="var(--clay-500)" ` +
+            `fill-opacity="0.11"/>`;
+        }
+
+        function draw() {
+          const info = spanInfo();
+          drawSpan(info);
+
+          let vs = "", hs = "";
+          vectors.forEach((v, i) => {
+            const name = "v" + sub(i + 1);
+            vs += arrow(sx(0), sy(0), sx(v.x), sy(v.y), v.color, 2.8);
+            const len = Math.hypot(v.x, v.y) || 1;
+            const ox = (v.x / len) * 0.46, oy = (v.y / len) * 0.46;
+            vs += `<text class="vlabel" x="${lx(sx(v.x + ox))}" ` +
+              `y="${ly(sy(v.y + oy))}" fill="${v.color}">${name}</text>`;
+            hs += `<circle class="handle" data-id="${v.id}" cx="${sx(v.x)}" cy="${sy(v.y)}" ` +
+              `r="15" tabindex="0" role="button" aria-label="Drag ${name}"/>` +
+              `<circle class="handle-ring" cx="${sx(v.x)}" cy="${sy(v.y)}" r="11" stroke="${v.color}"/>`;
+          });
+          $("vectors").innerHTML = vs;
+          $("handles").innerHTML = hs;
+          $("hint").hidden = vectors.length > 0;
+
+          const names = vectors.map((_, i) => "v" + sub(i + 1)).join(", ");
+          const label = vectors.length ? `span{ ${names} }` : "span{ }";
+          if (info.rank === 0) {
+            $("verdict").textContent = "The zero subspace";
+            $("verdict-sub").textContent = `${label} = { 0 }`;
+            $("note").textContent =
+              "Every combination of nothing — or of zero vectors — is the zero vector. It is the smallest subspace, and it sits inside every other one.";
+          } else if (info.rank === 1) {
+            $("verdict").textContent = "A line through the origin";
+            $("verdict-sub").textContent = `${label} = a line`;
+            $("note").textContent =
+              vectors.filter((v) => v.x || v.y).length > 1
+                ? "These all lie along one line, so the extra ones add nothing new. They are linearly dependent."
+                : "One direction, scaled by every real number, sweeps out a line — and that line is a subspace.";
+          } else {
+            $("verdict").textContent = "The whole plane";
+            $("verdict-sub").textContent = `${label} = ℝ²`;
+            $("note").textContent =
+              "Two independent directions are enough to reach every point in ℝ². Any further vectors are already reachable and cannot enlarge the span.";
+          }
+          $("dim").textContent = info.rank;
+
+          renderList();
+        }
+
+        function renderList() {
+          const list = $("glossary");
+          list.innerHTML = "";
+          vectors.forEach((v, i) => {
+            const li = document.createElement("li");
+            li.className = "vrow";
+            li.innerHTML =
+              `<span class="swatch" style="background:${v.color}"></span>` +
+              `<span class="vname">v${sub(i + 1)}</span>` +
+              `<input type="number" step="1" value="${v.x}" data-axis="x" aria-label="v${sub(i + 1)} x component" />` +
+              `<input type="number" step="1" value="${v.y}" data-axis="y" aria-label="v${sub(i + 1)} y component" />` +
+              `<button class="icon-btn" type="button" aria-label="Delete v${sub(i + 1)}">×</button>`;
+            li.querySelectorAll("input").forEach((inp) => {
+              inp.addEventListener("input", () => {
+                const n = Number(inp.value);
+                if (inp.value === "" || Number.isNaN(n)) return;
+                const axis = inp.dataset.axis;
+                const lim = axis === "x" ? XMAX : YMAX;
+                v[axis] = Math.max(-lim, Math.min(lim, Math.round(n)));
+                draw();
+              });
+            });
+            li.querySelector("button").addEventListener("click", () => {
+              vectors = vectors.filter((w) => w.id !== v.id);
+              draw();
+            });
+            list.appendChild(li);
+          });
+          $("empty").hidden = vectors.length > 0;
+          $("add").disabled = vectors.length >= MAX_VECTORS;
+        }
+
+        // Keep the number fields in step with a drag without rebuilding the
+        // list, which would drop focus mid-interaction.
+        function syncInputs() {
+          const rows = $("glossary").children;
+          vectors.forEach((v, i) => {
+            const row = rows[i];
+            if (!row) return;
+            const [ix, iy] = row.querySelectorAll("input");
+            if (document.activeElement !== ix) ix.value = v.x;
+            if (document.activeElement !== iy) iy.value = v.y;
+          });
+        }
+
+        const occupied = (x, y) => vectors.some((v) => v.x === x && v.y === y);
+
+        function addVector(x, y) {
+          if (vectors.length >= MAX_VECTORS || occupied(x, y)) return;
+          vectors.push({ id: nextId++, x: x, y: y, color: warmColor() });
+          draw();
+        }
+
+        function freeSpot() {
+          const cand = [[3, 1], [1, 3], [-2, 2], [2, -2], [-3, -1]];
+          for (const [x, y] of cand) if (!occupied(x, y)) return [x, y];
+          for (let r = 1; r <= 6; r++)
+            for (let x = -r; x <= r; x++)
+              for (let y = -r; y <= r; y++)
+                if ((x || y) && !occupied(x, y)) return [x, y];
+          return [1, 1];
+        }
+
+        function toBoard(evt) {
+          const r = board.getBoundingClientRect();
+          const k = 704 / r.width;
+          return { x: (evt.clientX - r.left) * k, y: (evt.clientY - r.top) * k };
+        }
+        function snap(p) {
+          return {
+            x: Math.max(XMIN, Math.min(XMAX, Math.round((p.x - OX) / U))),
+            y: Math.max(YMIN, Math.min(YMAX, Math.round((OY - p.y) / U))),
+          };
+        }
+
+        let dragId = null, downAt = null;
+
+        board.addEventListener("pointerdown", (e) => {
+          const h = e.target.closest(".handle");
+          if (h) {
+            dragId = Number(h.dataset.id);
+            h.setPointerCapture(e.pointerId);
+            e.preventDefault();
+            return;
+          }
+          downAt = { x: e.clientX, y: e.clientY };
+        });
+        board.addEventListener("pointermove", (e) => {
+          if (dragId == null) return;
+          const v = vectors.find((w) => w.id === dragId);
+          if (!v) return;
+          const p = snap(toBoard(e));
+          if (p.x === v.x && p.y === v.y) return;
+          v.x = p.x;
+          v.y = p.y;
+          draw();
+          syncInputs();
+        });
+        board.addEventListener("pointerup", (e) => {
+          if (dragId != null) {
+            dragId = null;
+            downAt = null;
+            return;
+          }
+          if (!downAt) return;
+          const moved = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y);
+          downAt = null;
+          if (moved > 5) return;
+          const p = snap(toBoard(e));
+          addVector(p.x, p.y);
+        });
+        board.addEventListener("pointercancel", () => (dragId = null));
+
+        board.addEventListener("keydown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          const d = {
+            ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+            ArrowUp: [0, 1], ArrowDown: [0, -1],
+          }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const id = Number(h.dataset.id);
+          const v = vectors.find((w) => w.id === id);
+          if (!v) return;
+          v.x = Math.max(XMIN, Math.min(XMAX, v.x + d[0]));
+          v.y = Math.max(YMIN, Math.min(YMAX, v.y + d[1]));
+          draw();
+          syncInputs();
+          const again = $("handles").querySelector(`.handle[data-id="${id}"]`);
+          if (again) again.focus();
+        });
+
+        $("add").addEventListener("click", () => addVector(...freeSpot()));
+        $("clear").addEventListener("click", () => {
+          vectors = [];
+          draw();
+        });
+
+        buildGrid();
+        addVector(3, 1);
+        addVector(1, 3);
+      })();
+    </script>
+  </body>
+</html>

@@ -131,7 +131,40 @@ def transformation():
     )
 
 
+# ------------------------------------------------------------ vector spaces
+def vectorspace():
+    """A line through the origin sitting inside the plane: a subspace."""
+    u, ox, oy = 26.0, 160.0, 80.0
+
+    def V(x, y):
+        return (ox + u * x, oy - u * y)
+
+    body = []
+    for gx in range(-6, 7):
+        body.append(line(V(gx, -3), V(gx, 3), P["grid"], 1.0))
+    for gy in range(-3, 4):
+        body.append(line(V(-6, gy), V(6, gy), P["grid"], 1.0))
+    body.append(line(V(-6, 0), V(6, 0), P["axis"], 1.2))
+    body.append(line(V(0, -3), V(0, 3), P["axis"], 1.2))
+
+    # the subspace, tinted and dashed
+    body.append(line(V(-5.4, -2.7), V(5.4, 2.7), P["clay"], 13, 0.16))
+    body.append(line(V(-5.4, -2.7), V(5.4, 2.7), P["clay"], 1.4, 0.7, dash="6 5"))
+    body.append(arrow(V(0, 0), V(2, 1), P["clay"], 2.4, head_max=10))
+    body.append(arrow(V(2, 1), V(4, 2), P["sage"], 2.0, head_max=10))
+    body.append(f'<circle cx="{V(0, 0)[0]}" cy="{V(0, 0)[1]}" r="3.4" fill="{P["ink900"]}"/>')
+
+    write_svg(
+        "assets/thumbs/vectorspace.svg",
+        svg_doc(
+            W, H, body, "A line through the origin inside the plane",
+            background=P["plate"], clip_id="plate",
+        ),
+    )
+
+
 if __name__ == "__main__":
     lincomb()
     dotproduct()
     transformation()
+    vectorspace()
