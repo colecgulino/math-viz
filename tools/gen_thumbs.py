@@ -163,8 +163,61 @@ def vectorspace():
     )
 
 
+# ------------------------------------------------------------- column spaces
+def columnspace():
+    """Two columns in 3D and the plane they span, orthographic."""
+    import math
+
+    yaw, pitch, k = 0.62, 0.42, 15.0
+    ox, oy = 152.0, 82.0
+    ct, st = math.cos(yaw), math.sin(yaw)
+    cp, sp = math.cos(pitch), math.sin(pitch)
+    rgt = (-st, ct, 0.0)
+    up = (-sp * ct, -sp * st, cp)
+
+    def pr(v):
+        d = lambda a, b: a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+        return (ox + k * d(v, rgt), oy - k * d(v, up))
+
+    a1, a2 = (2, 1, -1), (1, 2, -2)
+    e1 = (0.8165, 0.4082, -0.4082)          # a1 normalised
+    e2 = (-0.0, 0.7071, -0.7071)            # a2 orthogonalised against a1
+    def pt(s_, t_):
+        return (e1[0] * s_ + e2[0] * t_, e1[1] * s_ + e2[1] * t_,
+                e1[2] * s_ + e2[2] * t_)
+
+    R = 3.1
+    body = []
+    quad = [pr(pt(-R, -R)), pr(pt(R, -R)), pr(pt(R, R)), pr(pt(-R, R))]
+    body.append(
+        '<path d="M' + " L".join(f"{x:.1f},{y:.1f}" for x, y in quad)
+        + f' Z" fill="{P["ochre"]}" fill-opacity="0.17"/>'
+    )
+    for i in range(-3, 4):
+        u = i * R / 3
+        body.append(line(pr(pt(u, -R)), pr(pt(u, R)), P["ochre"], 1.0, 0.5))
+        body.append(line(pr(pt(-R, u)), pr(pt(R, u)), P["ochre"], 1.0, 0.5))
+    for ax in ((4.0, 0, 0), (0, 4.0, 0), (0, 0, 4.0)):
+        neg = tuple(-c for c in ax)
+        body.append(line(pr(neg), pr((0, 0, 0)), P["sand400"], 1.0, dash="3 4"))
+        body.append(line(pr((0, 0, 0)), pr(ax), P["axis"], 1.2))
+    body.append(arrow(pr((0, 0, 0)), pr(a1), P["clay"], 2.2, head_max=9))
+    body.append(arrow(pr((0, 0, 0)), pr(a2), P["sage"], 2.2, head_max=9))
+    b = (a1[0] + a2[0], a1[1] + a2[1], a1[2] + a2[2])
+    body.append(arrow(pr((0, 0, 0)), pr(b), P["ink900"], 2.6, head_max=10))
+
+    write_svg(
+        "assets/thumbs/columnspace.svg",
+        svg_doc(
+            W, H, body, "Two columns in three dimensions and the plane they span",
+            background=P["plate"], clip_id="plate",
+        ),
+    )
+
+
 if __name__ == "__main__":
     lincomb()
     dotproduct()
     transformation()
     vectorspace()
+    columnspace()

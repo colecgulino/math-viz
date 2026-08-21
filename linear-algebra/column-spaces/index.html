@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Column Spaces — math-viz</title>
+    <meta
+      name="description"
+      content="Ax = b reads as a linear combination of the columns of A. The set of every b you can reach is the column space."
+    />
+    <link rel="stylesheet" href="../../assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* ---- explainer prose ---- */
+      .jump {
+        display: inline-block;
+        margin-top: 18px;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .jump:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .explainer {
+        padding-block: 10px 6px;
+      }
+      .explainer > section + section {
+        margin-top: 46px;
+      }
+      .explainer h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+      }
+      .explainer h3 {
+        font-size: 1.02rem;
+        margin: 30px 0 12px;
+        color: var(--clay-600);
+      }
+      .explainer p {
+        max-width: var(--measure);
+        margin: 0 0 17px;
+      }
+      .sym {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-900);
+      }
+      .calc {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        line-height: 1.9;
+        color: var(--ink-900);
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        max-width: var(--measure);
+        overflow-x: auto;
+      }
+      .calc .muted {
+        color: var(--ink-400);
+      }
+      .calc b {
+        color: var(--clay-600);
+        font-weight: 500;
+      }
+
+      /* ---- special-matrix patterns ---- */
+      .patterns {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+        gap: 16px;
+        max-width: var(--measure);
+        margin: 0 0 22px;
+        padding: 0;
+        list-style: none;
+      }
+      .pat-card {
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 15px 12px 13px;
+        text-align: center;
+      }
+      .pat {
+        display: inline-grid;
+        grid-template-columns: repeat(3, 17px);
+        gap: 3px;
+        margin-bottom: 11px;
+      }
+      .pat span {
+        width: 17px;
+        height: 17px;
+        border-radius: 3px;
+        background: var(--sand-300);
+      }
+      .pat span.on {
+        background: var(--clay-500);
+      }
+      .pat-name {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--ink-900);
+        display: block;
+      }
+      .pat-col {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--ink-400);
+        margin-top: 5px;
+        line-height: 1.45;
+      }
+
+      /* ---- board ---- */
+      .board-wrap {
+        position: relative;
+      }
+      #board {
+        touch-action: none;
+        cursor: grab;
+      }
+      #board.dragging {
+        cursor: grabbing;
+      }
+      .axis-line {
+        stroke: var(--axis-line);
+        stroke-width: 1.4;
+      }
+      .axis-neg {
+        stroke: var(--sand-500);
+        stroke-width: 1.2;
+        stroke-dasharray: 4 5;
+      }
+      .axis-tag {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 15px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+      .plane-grid {
+        stroke: var(--ochre, #c99a2e);
+        stroke-width: 1;
+        stroke-opacity: 0.5;
+        fill: none;
+      }
+      .vlabel {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 16px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+      }
+      .hint {
+        position: absolute;
+        left: 50%;
+        bottom: 18px;
+        transform: translateX(-50%);
+        margin: 0;
+        font-size: 0.83rem;
+        color: var(--ink-400);
+        background: rgba(246, 239, 227, 0.92);
+        border: var(--border);
+        border-radius: 999px;
+        padding: 4px 13px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .hint[hidden] {
+        display: none;
+      }
+
+      /* ---- controls ---- */
+      .matrix {
+        display: inline-grid;
+        position: relative;
+        padding: 9px 15px;
+        gap: 6px 10px;
+        font-family: var(--font-mono);
+        font-size: 0.86rem;
+        color: var(--ink-900);
+        width: 100%;
+      }
+      .matrix--3x2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .matrix--2x1 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .matrix::before,
+      .matrix::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        border: 1.5px solid var(--ink-400);
+      }
+      .matrix::before {
+        left: 0;
+        border-right: none;
+      }
+      .matrix::after {
+        right: 0;
+        border-left: none;
+      }
+      .matrix input {
+        text-align: right;
+        padding: 3px 6px;
+      }
+      .colhead {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0 15px;
+        margin-bottom: 5px;
+      }
+      .colhead span {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+      .ax-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 10px;
+      }
+      .ax-times {
+        font-family: var(--font-mono);
+        color: var(--ink-400);
+        font-size: 0.9rem;
+      }
+      .control {
+        margin-bottom: 14px;
+      }
+      .control-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 4px;
+      }
+      .control label {
+        font-size: 0.9rem;
+        color: var(--ink-700);
+      }
+      .control output {
+        font-family: var(--font-mono);
+        font-size: 0.84rem;
+        color: var(--clay-600);
+      }
+      .verdict {
+        font-family: var(--font-display);
+        font-size: 1.12rem;
+        color: var(--ink-900);
+        margin: 0 0 6px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+        border-top: var(--border);
+        padding-top: 12px;
+        margin-top: 12px;
+      }
+      .stats span:nth-child(even) {
+        color: var(--ink-900);
+        text-align: right;
+      }
+      .note {
+        font-size: 0.83rem;
+        color: var(--ink-500);
+        line-height: 1.55;
+        margin: 12px 0 0;
+        border-top: var(--border);
+        padding-top: 12px;
+      }
+      .note--warn {
+        color: var(--clay-600);
+      }
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topbar page"><a href="../../">&larr; Index</a></nav>
+
+    <header class="intro page">
+      <h1>Column Spaces</h1>
+      <p>
+        The equation <span class="sym">A</span><span class="sym">x</span> =
+        <span class="sym">b</span> is usually taught as a system to be solved.
+        Read it the other way round and it says something simpler: it asks
+        whether <span class="sym">b</span> is one of the vectors you can build
+        out of the columns of <span class="sym">A</span>. The set of all the
+        ones you can is a subspace, and it has a name.
+      </p>
+      <a class="jump" href="#col-section">Skip to the board &darr;</a>
+    </header>
+
+    <div class="explainer page">
+      <section>
+        <h2>Ax is a linear combination of the columns</h2>
+        <p>
+          Write <span class="sym">A</span> out by its columns rather than its
+          rows. A 3×2 matrix is two vectors in ℝ³ standing side by side, and
+          <span class="sym">x</span> is a pair of scalars. Multiplying them out
+          gives:
+        </p>
+        <div class="calc">
+          A = [ a₁ &nbsp;a₂ ] &nbsp;&nbsp;&nbsp;
+          <span class="muted">two columns, each a vector in ℝ³</span><br /><br />
+          Ax = <b>x₁</b>a₁ + <b>x₂</b>a₂
+        </div>
+        <p>
+          That is the same move as
+          <a href="../linear-transformations/">linear transformations</a>, where
+          the columns were the landing spots of
+          <span class="sym">î</span> and <span class="sym">ĵ</span> and the
+          coordinates told you how much of each to take. Here the coordinates
+          live in <span class="sym">x</span>, but the arithmetic is identical:
+          the entries of <span class="sym">x</span> are the coefficients, the
+          columns of <span class="sym">A</span> are the ingredients, and
+          <span class="sym">b</span> is what you get when you mix them.
+        </p>
+        <div class="calc">
+          <span class="muted">a₁ = (2, 1, −1)&nbsp;&nbsp;a₂ = (1, 2, −2)&nbsp;&nbsp;x = (2, −1)</span><br /><br />
+          b = <b>2</b>(2, 1, −1) + <b>(−1)</b>(1, 2, −2)<br />
+          &nbsp;&nbsp;= (4, 2, −2) + (−1, −2, 2)<br />
+          &nbsp;&nbsp;= (3, 0, 0)
+        </div>
+        <p>
+          So solving <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> means hunting for coefficients that mix the
+          columns into <span class="sym">b</span>. If no such coefficients
+          exist, the system has no solution — not because the arithmetic went
+          wrong, but because <span class="sym">b</span> was never reachable in
+          the first place.
+        </p>
+      </section>
+
+      <section>
+        <h2>The column space</h2>
+        <p>
+          Sweep <span class="sym">x</span> over every possible pair of scalars
+          and collect all the <span class="sym">b</span> you get. That
+          collection is the <strong>column space</strong> of
+          <span class="sym">A</span>, written Col(<span class="sym">A</span>).
+        </p>
+        <div class="calc">
+          Col(A) = { Ax : x ∈ ℝⁿ } = span{ a₁, a₂, … , aₙ }
+        </div>
+        <p>
+          Written that way it is nothing new. It is the
+          <a href="../vector-spaces/">span</a> of the columns, and a span is
+          always a subspace: it contains <strong>0</strong> (take every
+          coefficient zero), the sum of two combinations is a combination, and a
+          scaled combination is a combination. All three subspace conditions,
+          satisfied for free.
+        </p>
+        <p>
+          Which turns a question about solving equations into a question about
+          geometry. <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> has a solution exactly when
+          <span class="sym">b</span> lies inside Col(<span class="sym">A</span>),
+          and no amount of algebra will find one when it does not.
+        </p>
+        <p>
+          The board below takes a 3×2 matrix — two columns, each a vector in ℝ³
+          — and draws the subspace they span. Type your own numbers in, then
+          move <span class="sym">x</span> and watch
+          <span class="sym">b</span> travel. Drag the board to spin the view.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="col-section">
+      <div class="plate">
+        <div class="board-wrap">
+          <svg
+            id="board"
+            viewBox="0 0 704 528"
+            aria-label="Two columns of a 3 by 2 matrix in three dimensions with the subspace they span"
+          >
+            <g id="axes"></g>
+            <g id="plane"></g>
+            <g id="combo"></g>
+            <g id="cols"></g>
+          </svg>
+          <p class="hint" id="hint">Drag to rotate.</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>A and x</h2>
+          <div class="colhead"><span>a₁</span><span>a₂</span></div>
+          <div class="ax-row">
+            <div class="matrix matrix--3x2">
+              <input id="m00" type="number" step="1" value="2" aria-label="a1 x" />
+              <input id="m01" type="number" step="1" value="1" aria-label="a2 x" />
+              <input id="m10" type="number" step="1" value="1" aria-label="a1 y" />
+              <input id="m11" type="number" step="1" value="2" aria-label="a2 y" />
+              <input id="m20" type="number" step="1" value="-1" aria-label="a1 z" />
+              <input id="m21" type="number" step="1" value="-2" aria-label="a2 z" />
+            </div>
+            <span class="ax-times">×</span>
+            <div class="matrix matrix--2x1">
+              <input id="x0" type="number" step="0.5" value="1" aria-label="x1" />
+              <input id="x1" type="number" step="0.5" value="1" aria-label="x2" />
+            </div>
+          </div>
+
+          <div class="control" style="margin-top: 16px">
+            <div class="control-row">
+              <label for="s0">x₁</label><output id="s0-out">1</output>
+            </div>
+            <input id="s0" type="range" min="-2" max="2" step="0.5" value="1" />
+          </div>
+          <div class="control">
+            <div class="control-row">
+              <label for="s1">x₂</label><output id="s1-out">1</output>
+            </div>
+            <input id="s1" type="range" min="-2" max="2" step="0.5" value="1" />
+          </div>
+
+          <div class="btnrow">
+            <button class="btn" type="button" data-preset="2,1,1,2,-1,-2">Plane</button>
+            <button class="btn" type="button" data-preset="2,4,1,2,-1,-2">Line</button>
+            <button class="btn" type="button" data-preset="0,0,0,0,0,0">Zero</button>
+            <button class="btn" id="reset-view" type="button">Reset view</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Column space</h2>
+          <p class="verdict" id="verdict"></p>
+          <p
+            style="
+              font-family: var(--font-mono);
+              font-size: 0.82rem;
+              color: var(--ink-400);
+              margin: 0;
+            "
+            id="bval"
+          ></p>
+          <div class="stats">
+            <span>rank of A</span><span id="rank">2</span>
+            <span>dim Col(A)</span><span id="dim">2</span>
+          </div>
+          <p class="note" id="note"></p>
+          <p class="note note--warn">
+            Two columns can span at most a plane, whatever numbers you choose.
+            Reaching all of ℝ³ needs three independent columns.
+          </p>
+        </section>
+      </aside>
+    </div>
+
+    <div class="explainer page">
+      <section>
+        <h2>Why ℝ³ needs three columns</h2>
+        <p>
+          However you fill in a 3×2 matrix, the board never tints all of space.
+          The reason is a counting argument rather than a geometric accident:
+          the span of <span class="sym">n</span> vectors has dimension at most
+          <span class="sym">n</span>. Two columns give you at most a plane —
+          less if they happen to line up, and nothing at all if they are both
+          zero.
+        </p>
+        <div class="calc">
+          dim Col(A) &nbsp;=&nbsp; rank(A) &nbsp;≤&nbsp; number of columns
+        </div>
+        <p>
+          So a 3×2 matrix always leaves most of ℝ³ unreachable. Pick a
+          <span class="sym">b</span> off that plane and
+          <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> has no solution, for any
+          <span class="sym">x</span> at all. To reach every point of ℝ³ you need
+          a 3×3 matrix, and not just any one: its three columns have to be
+          linearly independent. If they are, the rank is 3, the column space is
+          all of ℝ³, and
+          <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> is solvable for every
+          <span class="sym">b</span>. If they are not — if one column is a
+          combination of the other two — the rank drops back to 2 and the column
+          space collapses to a plane again, which is exactly the
+          <a href="../linear-transformations/">zero determinant</a> case seen
+          from the other side.
+        </p>
+      </section>
+
+      <section>
+        <h2>Special matrices and their column spaces</h2>
+        <p>
+          Some shapes of matrix make the column space easy to read off. Filled
+          cells below mark entries allowed to be nonzero:
+        </p>
+
+        <ul class="patterns">
+          <li class="pat-card">
+            <div class="pat" role="img" aria-label="Identity pattern: nonzero on the diagonal only">
+              <span class="on"></span><span></span><span></span>
+              <span></span><span class="on"></span><span></span>
+              <span></span><span></span><span class="on"></span>
+            </div>
+            <span class="pat-name">I</span>
+            <p class="pat-col">columns are ê₁, ê₂, ê₃<br />Col = ℝ³</p>
+          </li>
+          <li class="pat-card">
+            <div class="pat" role="img" aria-label="Zero matrix pattern: every entry zero">
+              <span></span><span></span><span></span>
+              <span></span><span></span><span></span>
+              <span></span><span></span><span></span>
+            </div>
+            <span class="pat-name">Z</span>
+            <p class="pat-col">every column is 0<br />Col = { 0 }</p>
+          </li>
+          <li class="pat-card">
+            <div class="pat" role="img" aria-label="Diagonal pattern: nonzero on the diagonal only">
+              <span class="on"></span><span></span><span></span>
+              <span></span><span class="on"></span><span></span>
+              <span></span><span></span><span class="on"></span>
+            </div>
+            <span class="pat-name">diagonal</span>
+            <p class="pat-col">columns are dᵢêᵢ<br />Col = ℝ³ if no dᵢ = 0</p>
+          </li>
+          <li class="pat-card">
+            <div class="pat" role="img" aria-label="Upper triangular pattern: nonzero on and above the diagonal">
+              <span class="on"></span><span class="on"></span><span class="on"></span>
+              <span></span><span class="on"></span><span class="on"></span>
+              <span></span><span></span><span class="on"></span>
+            </div>
+            <span class="pat-name">upper △</span>
+            <p class="pat-col">Col = ℝ³ if no zero<br />on the diagonal</p>
+          </li>
+          <li class="pat-card">
+            <div class="pat" role="img" aria-label="Lower triangular pattern: nonzero on and below the diagonal">
+              <span class="on"></span><span></span><span></span>
+              <span class="on"></span><span class="on"></span><span></span>
+              <span class="on"></span><span class="on"></span><span class="on"></span>
+            </div>
+            <span class="pat-name">lower △</span>
+            <p class="pat-col">Col = ℝ³ if no zero<br />on the diagonal</p>
+          </li>
+        </ul>
+
+        <p>
+          The identity is the easy case: its columns
+          <em>are</em> the standard basis, so they are independent and
+          Col(<span class="sym">I</span>) is the whole space.
+          <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> becomes
+          <span class="sym">x</span> = <span class="sym">b</span>. The zero
+          matrix is the opposite extreme: every column is
+          <strong>0</strong>, every combination of them is
+          <strong>0</strong>, and the column space is the zero subspace.
+        </p>
+        <p>
+          A diagonal matrix scales each axis independently, so its columns are
+          the standard basis vectors stretched by the diagonal entries. As long
+          as none of them is zero the directions are untouched and the column
+          space is everything. Put a zero in the <span class="sym">i</span>th
+          diagonal slot and that whole column vanishes; the column space drops
+          to the span of the remaining axes — a coordinate plane, or a line.
+        </p>
+        <p>
+          Triangular matrices behave the same way for the same underlying
+          reason: their determinant is the product of the diagonal entries, so
+          they are invertible precisely when no diagonal entry is zero, and
+          invertible is the same as full column space. A zero on the diagonal
+          costs you a dimension.
+        </p>
+      </section>
+
+      <section>
+        <h2>The matrices themselves form a space</h2>
+        <p>
+          Everything above treats a matrix as a machine acting on vectors. There
+          is a second, quite different reading: treat the matrix as
+          <em>itself</em> a vector. You can add two matrices, you can scale one
+          by a number, and those operations satisfy all
+          <a href="../vector-spaces/">eight axioms</a>. So the set of all 3×3
+          matrices is a vector space, of dimension 9 — one dimension per entry.
+        </p>
+        <p>
+          That immediately raises the subspace question. Do the diagonal
+          matrices form a subspace of it? Run the three-part test:
+        </p>
+        <div class="calc">
+          the zero matrix is diagonal
+          <span class="muted">&nbsp;&nbsp;✓ contains 0</span><br />
+          diagonal + diagonal = diagonal
+          <span class="muted">&nbsp;&nbsp;✓ closed under addition</span><br />
+          c · diagonal = diagonal
+          <span class="muted">&nbsp;&nbsp;✓ closed under scaling</span>
+        </div>
+        <p>
+          All three hold, so the diagonal matrices are a genuine subspace — of
+          dimension 3 inside the 9, one per diagonal slot. Adding two diagonal
+          matrices can never wake up an off-diagonal entry, because zero plus
+          zero is zero, and scaling cannot either. The same argument works for
+          the upper triangular matrices (dimension 6) and for the symmetric
+          matrices. Notice these are statements about closure, not about what
+          the matrices <em>do</em>: the diagonal matrices are closed under
+          addition even though they are not closed under, say, inversion of a
+          singular one.
+        </p>
+
+        <h3>A set that fails</h3>
+        <p>
+          Now take the set of matrices whose entries are
+          <strong>all strictly negative</strong>. It is worth working through
+          carefully, because it fails in an instructive way — one of the three
+          conditions actually holds:
+        </p>
+        <div class="calc">
+          the zero matrix has entries 0, not negative
+          <span class="muted">&nbsp;&nbsp;✗ no zero</span><br />
+          negative + negative = negative
+          <span class="muted">&nbsp;&nbsp;✓ closed under addition</span><br />
+          (−1) · negative = positive
+          <span class="muted">&nbsp;&nbsp;✗ leaves the set</span>
+        </div>
+        <p>
+          Adding two all-negative matrices really does give an all-negative
+          matrix, so closure under addition is satisfied. It is not enough.
+          Scaling by −1 flips every entry positive and lands outside the set,
+          and scaling by 0 produces the zero matrix, which is also outside. The
+          set is not a subspace, and the same reasoning rules out the vectors in
+          ℝ² with both entries positive, the unit circle, and any region that
+          does not stretch away from the origin in both directions forever.
+        </p>
+        <p>
+          This is why closure under scaling is the condition that does most of
+          the work. It forces a subspace to be unbounded, to be symmetric
+          through the origin, and to contain
+          <strong>0</strong> — all from one requirement.
+        </p>
+      </section>
+    </div>
+
+    <section class="notes page">
+      <h2>Reading the board</h2>
+      <p>
+        The two solid arrows are the columns of <span class="sym">A</span>,
+        drawn in ℝ³. The tinted sheet is Col(<span class="sym">A</span>) — every
+        vector you can build from them. The dashed pair shows the recipe being
+        carried out: walk x₁ along the first column, then x₂ along the second
+        from wherever you land, and the dark arrow to the finish is
+        <span class="sym">b</span>.
+      </p>
+      <p>
+        The thing to notice is what <em>never</em> happens. Move both sliders
+        through their whole range and <span class="sym">b</span> stays welded to
+        the sheet. There is no setting of <span class="sym">x</span> that lifts
+        it off, because every reachable point is a combination of the columns
+        and the sheet is precisely the set of those combinations. Any
+        <span class="sym">b</span> you can point to off the sheet corresponds to
+        a system with no solution.
+      </p>
+      <p>
+        Try the <em>Line</em> preset, where the second column is a multiple of
+        the first. The sheet collapses, the rank drops to 1, and two independent
+        knobs now steer along a single direction — different pairs of
+        coefficients produce the same <span class="sym">b</span>. That is the
+        column-space view of a matrix losing rank, and it is the same collapse a
+        <a href="../linear-transformations/">zero determinant</a> causes and the
+        same one that turns a span from a plane into a
+        <a href="../vector-spaces/">line</a>.
+      </p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const $ = (id) => document.getElementById(id);
+        const CLAY = "#bf5b2e", SAGE = "#5f7161", OCHRE = "#c99a2e";
+        const CX = 352, CY = 264, S = 44;
+        const AXIS = 4.3;
+
+        let yaw = 0.62, pitch = 0.42;
+
+        // --- small vector helpers -------------------------------------
+        const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+        const scale = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
+        const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+        const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+        const norm = (a) => Math.sqrt(dot(a, a));
+        const cross = (a, b) => [
+          a[1] * b[2] - a[2] * b[1],
+          a[2] * b[0] - a[0] * b[2],
+          a[0] * b[1] - a[1] * b[0],
+        ];
+
+        // Orthographic camera: a right vector and an up vector, both unit and
+        // perpendicular to the view direction.
+        function proj(p) {
+          const ct = Math.cos(yaw), st = Math.sin(yaw);
+          const cp = Math.cos(pitch), sp = Math.sin(pitch);
+          const rgt = [-st, ct, 0];
+          const up = [-sp * ct, -sp * st, cp];
+          return [CX + S * dot(p, rgt), CY - S * dot(p, up)];
+        }
+
+        function arrow(p0, p1, color, w, opts) {
+          const o = opts || {};
+          const [x1, y1] = proj(p0);
+          const [x2, y2] = proj(p1);
+          const dx = x2 - x1, dy = y2 - y1;
+          const len = Math.hypot(dx, dy);
+          if (len < 2) return "";
+          const ux = dx / len, uy = dy / len;
+          const head = Math.min(14, len * 0.45);
+          const hw = head * 0.42;
+          const bx = x2 - ux * head, by = y2 - uy * head;
+          const px = -uy, py = ux;
+          const dash = o.dash ? ` stroke-dasharray="${o.dash}"` : "";
+          const op = o.opacity == null ? 1 : o.opacity;
+          const f = (n) => n.toFixed(1);
+          return (
+            `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux)}" y2="${f(by + uy)}" ` +
+            `stroke="${color}" stroke-width="${w}" stroke-opacity="${op}" ` +
+            `stroke-linecap="round"${dash}/>` +
+            `<path d="M${f(x2)},${f(y2)} L${f(bx + px * hw)},${f(by + py * hw)} ` +
+            `L${f(bx - px * hw)},${f(by - py * hw)} Z" fill="${color}" fill-opacity="${op}"/>`
+          );
+        }
+
+        const lx = (v) => Math.max(14, Math.min(690, v));
+        const ly = (v) => Math.max(13, Math.min(515, v));
+
+        const seg = (p0, p1, cls) => {
+          const a = proj(p0), b = proj(p1);
+          return `<line class="${cls}" x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" ` +
+            `x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}"/>`;
+        };
+
+        // --- state -----------------------------------------------------
+        const ids = ["m00", "m01", "m10", "m11", "m20", "m21"];
+        const readA = () => {
+          const v = ids.map((i) => {
+            const n = Number($(i).value);
+            return Number.isNaN(n) ? 0 : Math.max(-4, Math.min(4, n));
+          });
+          return [
+            [v[0], v[2], v[4]], // a1
+            [v[1], v[3], v[5]], // a2
+          ];
+        };
+        const readX = () => [Number($("x0").value) || 0, Number($("x1").value) || 0];
+
+        function drawAxes() {
+          let s = "";
+          const ax = [
+            [[AXIS, 0, 0], "x"],
+            [[0, AXIS, 0], "y"],
+            [[0, 0, AXIS], "z"],
+          ];
+          ax.forEach(([p]) => {
+            s += seg(scale(p, -1), [0, 0, 0], "axis-neg");
+            s += seg([0, 0, 0], p, "axis-line");
+          });
+          ax.forEach(([p, name]) => {
+            const t = proj(scale(p, 1.13));
+            s += `<text class="axis-tag" x="${t[0].toFixed(1)}" y="${t[1].toFixed(1)}">${name}</text>`;
+          });
+          $("axes").innerHTML = s;
+        }
+
+        function rankOf(a1, a2) {
+          const c = cross(a1, a2);
+          if (norm(c) > 1e-9) return 2;
+          return norm(a1) > 1e-9 || norm(a2) > 1e-9 ? 1 : 0;
+        }
+
+        function draw() {
+          const [a1, a2] = readA();
+          const x = readX();
+          const b = add(scale(a1, x[0]), scale(a2, x[1]));
+          const r = rankOf(a1, a2);
+
+          // The drawn patch has to be big enough to contain b, or b would look
+          // as though it had escaped the subspace.
+          const R = Math.max(3.4, 1.05 * Math.max(norm(a1), norm(a2), norm(b)));
+          const Rc = Math.min(R, 7);
+
+          let plane = "";
+          if (r === 2) {
+            // Gram-Schmidt, so the sheet is a square patch whatever the inputs.
+            const e1 = scale(a1, 1 / norm(a1));
+            let w = sub3(a2, scale(e1, dot(a2, e1)));
+            const e2 = scale(w, 1 / norm(w));
+            const corner = (s, t) => add(scale(e1, s), scale(e2, t));
+            const c1 = proj(corner(-Rc, -Rc)), c2 = proj(corner(Rc, -Rc));
+            const c3 = proj(corner(Rc, Rc)), c4 = proj(corner(-Rc, Rc));
+            plane +=
+              `<path d="M${c1[0].toFixed(1)},${c1[1].toFixed(1)} L${c2[0].toFixed(1)},${c2[1].toFixed(1)} ` +
+              `L${c3[0].toFixed(1)},${c3[1].toFixed(1)} L${c4[0].toFixed(1)},${c4[1].toFixed(1)} Z" ` +
+              `fill="${OCHRE}" fill-opacity="0.15"/>`;
+            for (let i = -3; i <= 3; i++) {
+              const u = (i * Rc) / 3;
+              plane += `<polyline class="plane-grid" points="${
+                [proj(corner(u, -Rc)), proj(corner(u, Rc))]
+                  .map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+                  .join(" ")
+              }"/>`;
+              plane += `<polyline class="plane-grid" points="${
+                [proj(corner(-Rc, u)), proj(corner(Rc, u))]
+                  .map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+                  .join(" ")
+              }"/>`;
+            }
+          } else if (r === 1) {
+            const d = norm(a1) > 1e-9 ? a1 : a2;
+            const e = scale(d, 1 / norm(d));
+            const p0 = scale(e, -Rc), p1 = scale(e, Rc);
+            const q0 = proj(p0), q1 = proj(p1);
+            plane +=
+              `<line x1="${q0[0].toFixed(1)}" y1="${q0[1].toFixed(1)}" x2="${q1[0].toFixed(1)}" ` +
+              `y2="${q1[1].toFixed(1)}" stroke="${OCHRE}" stroke-width="15" ` +
+              `stroke-opacity="0.2" stroke-linecap="round"/>` +
+              `<line x1="${q0[0].toFixed(1)}" y1="${q0[1].toFixed(1)}" x2="${q1[0].toFixed(1)}" ` +
+              `y2="${q1[1].toFixed(1)}" stroke="${OCHRE}" stroke-width="1.6" ` +
+              `stroke-opacity="0.85" stroke-dasharray="7 6"/>`;
+          } else {
+            const o = proj([0, 0, 0]);
+            plane +=
+              `<circle cx="${o[0]}" cy="${o[1]}" r="8" fill="${OCHRE}" fill-opacity="0.3"/>` +
+              `<circle cx="${o[0]}" cy="${o[1]}" r="4" fill="${OCHRE}"/>`;
+          }
+          $("plane").innerHTML = plane;
+
+          // the recipe, walked out
+          const step1 = scale(a1, x[0]);
+          let combo =
+            arrow([0, 0, 0], step1, CLAY, 2, { dash: "6 5", opacity: 0.9 }) +
+            arrow(step1, b, SAGE, 2, { dash: "6 5", opacity: 0.9 }) +
+            arrow([0, 0, 0], b, "#2f2a25", 3.2);
+          const bt = proj(scale(b, norm(b) ? 1 + 0.42 / norm(b) : 1));
+          if (norm(b) > 0.05)
+            combo += `<text class="vlabel" x="${lx(bt[0]).toFixed(1)}" y="${ly(bt[1]).toFixed(1)}" ` +
+              `fill="#2f2a25">b</text>`;
+          $("combo").innerHTML = combo;
+
+          let cols = arrow([0, 0, 0], a1, CLAY, 3) + arrow([0, 0, 0], a2, SAGE, 3);
+          [[a1, "a₁", CLAY], [a2, "a₂", SAGE]].forEach(([v, name, c]) => {
+            if (norm(v) < 0.05) return;
+            const t = proj(scale(v, 1 + 0.42 / norm(v)));
+            cols += `<text class="vlabel" x="${lx(t[0]).toFixed(1)}" y="${ly(t[1]).toFixed(1)}" ` +
+              `fill="${c}">${name}</text>`;
+          });
+          $("cols").innerHTML = cols;
+
+          // --- readouts ---
+          const f2 = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+          $("bval").textContent =
+            `b = Ax = (${f2(b[0])}, ${f2(b[1])}, ${f2(b[2])})`;
+          $("rank").textContent = r;
+          $("dim").textContent = r;
+          if (r === 2) {
+            const n = cross(a1, a2);
+            $("verdict").textContent = "A plane through the origin";
+            $("note").textContent =
+              `Every b you can reach satisfies n · b = 0 for n = (${f2(n[0])}, ${f2(n[1])}, ${f2(n[2])}) — that single equation is the plane.`;
+          } else if (r === 1) {
+            $("verdict").textContent = "A line through the origin";
+            $("note").textContent =
+              "The two columns point along one direction, so the second buys nothing. The rank is 1 and different choices of x give the same b.";
+          } else {
+            $("verdict").textContent = "Just the origin";
+            $("note").textContent =
+              "Both columns are zero, so every combination of them is the zero vector. Ax = b is solvable only for b = 0.";
+          }
+        }
+
+        // --- rotate by dragging ---------------------------------------
+        let drag = null;
+        const board = $("board");
+        board.addEventListener("pointerdown", (e) => {
+          drag = { x: e.clientX, y: e.clientY };
+          board.setPointerCapture(e.pointerId);
+          board.classList.add("dragging");
+          $("hint").hidden = true;
+        });
+        board.addEventListener("pointermove", (e) => {
+          if (!drag) return;
+          yaw += (e.clientX - drag.x) * 0.009;
+          pitch = Math.max(-1.45, Math.min(1.45, pitch + (e.clientY - drag.y) * 0.009));
+          drag = { x: e.clientX, y: e.clientY };
+          drawAxes();
+          draw();
+        });
+        const stop = () => {
+          drag = null;
+          board.classList.remove("dragging");
+        };
+        board.addEventListener("pointerup", stop);
+        board.addEventListener("pointercancel", stop);
+
+        // --- wiring ----------------------------------------------------
+        ids.forEach((i) => $(i).addEventListener("input", draw));
+        [["s0", "x0"], ["s1", "x1"]].forEach(([sl, box]) => {
+          $(sl).addEventListener("input", () => {
+            $(box).value = $(sl).value;
+            $(sl + "-out").textContent = $(sl).value;
+            draw();
+          });
+          $(box).addEventListener("input", () => {
+            const n = Number($(box).value);
+            if ($(box).value === "" || Number.isNaN(n)) return;
+            $(sl).value = Math.max(-2, Math.min(2, n));
+            $(sl + "-out").textContent = $(sl).value;
+            draw();
+          });
+        });
+        document.querySelectorAll("[data-preset]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const v = btn.dataset.preset.split(",");
+            ids.forEach((id, k) => ($(id).value = v[k]));
+            draw();
+          });
+        });
+        $("reset-view").addEventListener("click", () => {
+          yaw = 0.62;
+          pitch = 0.42;
+          drawAxes();
+          draw();
+        });
+
+        drawAxes();
+        draw();
+      })();
+    </script>
+  </body>
+</html>
