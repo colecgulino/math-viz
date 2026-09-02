@@ -215,9 +215,47 @@ def columnspace():
     )
 
 
+# -------------------------------------------------------------- trigonometry
+def trigonometry():
+    """A 3-4-5 triangle with a square built on each side."""
+    u, ox, oy = 15.0, 118.0, 118.0
+    a, b = 3.0, 4.0
+    c = 5.0
+
+    def V(x, y):
+        return (ox + u * x, oy - u * y)
+
+    def quad(pts, colour):
+        d = " L".join(f"{V(x, y)[0]:.1f},{V(x, y)[1]:.1f}" for x, y in pts)
+        return (f'<path d="M{d} Z" fill="{colour}" fill-opacity="0.2" '
+                f'stroke="{colour}" stroke-width="1.3" stroke-opacity="0.75"/>')
+
+    nx, ny = -b / c, a / c
+    body = [
+        quad([(0, 0), (a, 0), (a, -a), (0, -a)], P["clay"]),
+        quad([(a, 0), (a + b, 0), (a + b, b), (a, b)], P["sage"]),
+        quad([(0, 0), (a, b), (a + nx * c, b + ny * c), (nx * c, ny * c)], P["ochre"]),
+        f'<path d="M{V(0,0)[0]:.1f},{V(0,0)[1]:.1f} L{V(a,0)[0]:.1f},{V(a,0)[1]:.1f} '
+        f'L{V(a,b)[0]:.1f},{V(a,b)[1]:.1f} Z" fill="{P["umber"]}" fill-opacity="0.3" '
+        f'stroke="{P["umber"]}" stroke-width="1.4"/>',
+    ]
+    body.append(arrow(V(0, 0), V(a, 0), P["clay"], 2.0, head_max=8))
+    body.append(arrow(V(a, 0), V(a, b), P["sage"], 2.0, head_max=8))
+    body.append(arrow(V(0, 0), V(a, b), P["ink900"], 2.4, head_max=9))
+
+    write_svg(
+        "assets/thumbs/trigonometry.svg",
+        svg_doc(
+            W, H, body, "A right triangle with a square on each side",
+            background=P["plate"], clip_id="plate",
+        ),
+    )
+
+
 if __name__ == "__main__":
     lincomb()
     dotproduct()
     transformation()
     vectorspace()
     columnspace()
+    trigonometry()

@@ -577,142 +577,18 @@
       </section>
 
       <section>
-        <h2>Two inequalities fall out of this</h2>
+        <h2>Two inequalities that follow</h2>
         <p>
-          Put the dot product and the length formula together and two bounds
-          appear. They look like technicalities. They are the reason any of the
-          preceding vocabulary is allowed to exist.
-        </p>
-
-        <h3>Cauchy–Schwarz</h3>
-        <div class="calc">|a · b| &nbsp;≤&nbsp; |a| |b|</div>
-        <p>
-          The geometric formula makes this nearly self-evident:
-          a · b = |a| |b| cos θ, and cos θ never escapes the band between −1 and
-          1 — which is the entire content of the curve plotted under the board.
-          Multiply through and the product of two vectors can never exceed the
-          product of their lengths.
+          Two bounds drop straight out of what is above. Cauchy–Schwarz says
+          |a · b| ≤ |a| |b| — the dot product can never beat the product of the
+          lengths, because cos θ never leaves the band between −1 and 1 that the
+          curve under the board traces out. The triangle inequality says
+          |a + b| ≤ |a| + |b|: the direct route is never longer than the detour.
         </p>
         <p>
-          The picture says it even faster. The shadow of
-          <span class="sym">a</span> on <span class="sym">b</span> has length
-          |a| |cos θ|, and a shadow is never longer than the thing casting it.
-          Multiply both sides of |shadow| ≤ |a| by |b| and you have the
-          inequality.
-        </p>
-        <p>
-          Deriving it without leaning on the angle takes one more step, and is
-          worth seeing because it never mentions geometry at all. Pick any
-          number <span class="sym">t</span>, slide
-          <span class="sym">t</span><span class="sym">b</span> along
-          <span class="sym">b</span>'s line, and look at what is left over. It's
-          a vector, so its squared length cannot be negative:
-        </p>
-        <div class="calc">
-          |a − tb|² &nbsp;=&nbsp; (a − tb) · (a − tb)<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;
-          |a|² − 2t(a · b) + t²|b|² &nbsp;≥&nbsp; 0
-        </div>
-        <p>
-          That is a quadratic in <span class="sym">t</span> that never dips
-          below zero, so it cannot cross the axis twice, so its discriminant is
-          at most zero:
-        </p>
-        <div class="calc">
-          4(a · b)² − 4|a|²|b|² &nbsp;≤&nbsp; 0<br />
-          (a · b)² &nbsp;≤&nbsp; |a|²|b|² <span class="muted">→</span>
-          |a · b| &nbsp;≤&nbsp; |a| |b|
-        </div>
-        <p>
-          <span class="muted-note"
-            >(If <span class="sym">b</span> is the zero vector both sides are
-            zero and there is nothing to prove.)</span
-          >
-          The <span class="sym">t</span> that minimises that quadratic works out
-          to (a · b)/|b|² — precisely the coefficient that produces the shadow on
-          the board. So the algebra is doing exactly what the picture does:
-          subtract off the shadow, then note that whatever sticks out sideways
-          still has a length, and lengths are never negative. Equality happens
-          when nothing sticks out — when <span class="sym">a</span> is a multiple
-          of <span class="sym">b</span>.
-        </p>
-
-        <h3>The triangle inequality</h3>
-        <div class="calc">|a + b| &nbsp;≤&nbsp; |a| + |b|</div>
-        <p>
-          Expand a sum the same way, using
-          <span class="sym">v</span> · <span class="sym">v</span> = |v|²:
-        </p>
-        <div class="calc">
-          |a + b|² &nbsp;=&nbsp; (a + b) · (a + b) &nbsp;=&nbsp;
-          |a|² + 2(a · b) + |b|²
-        </div>
-        <p>
-          Cauchy–Schwarz caps that middle term at |a| |b|, and the rest is a
-          perfect square:
-        </p>
-        <div class="calc">
-          |a + b|² &nbsp;≤&nbsp; |a|² + 2|a| |b| + |b|² &nbsp;=&nbsp;
-          (|a| + |b|)²
-        </div>
-        <p>
-          Both sides are non-negative, so taking square roots preserves the
-          inequality and the result follows.
-        </p>
-
-        <figure class="two-up">
-          <div>
-            <img
-              src="../../assets/figures/triangle-strict.svg"
-              alt="Vectors a and b laid tip to tail, with the shorter direct arrow a plus b closing the triangle."
-              width="364"
-              height="306"
-            />
-            <p class="fig-cap">|a + b| &lt; |a| + |b|</p>
-          </div>
-          <div>
-            <img
-              src="../../assets/figures/triangle-equality.svg"
-              alt="Two parallel vectors laid tip to tail, where the triangle collapses flat onto a line."
-              width="364"
-              height="306"
-            />
-            <p class="fig-cap">|a + b| = |a| + |b|</p>
-          </div>
-          <figcaption>
-            The detour and the direct route, and the one case where they agree.
-          </figcaption>
-        </figure>
-
-        <p>
-          The name carries the intuition. Lay <span class="sym">a</span> and
-          <span class="sym">b</span> tip to tail — the same walk the
-          <a href="../linear-combinations/">linear combinations</a> board draws
-          — and <span class="sym">a</span> + <span class="sym">b</span> is the
-          direct arrow from start to finish. The inequality says the direct
-          route is never longer than the detour. The two agree only when the
-          detour isn't one: when the vectors point the same way and the triangle
-          flattens onto a line.
-        </p>
-
-        <h3>Why they matter</h3>
-        <p>
-          These two bounds are what promote |v| = √(v · v) from a formula into a
-          usable notion of distance. Define the distance between two points as
-          |u − v| and the triangle inequality becomes the promise that you can
-          never get somewhere faster by detouring through a third point. A
-          "distance" without that guarantee would tell you nothing.
-        </p>
-        <p>
-          Cauchy–Schwarz does the same job for angle. Rearranged, the geometric
-          formula reads cos θ = (a · b) / (|a| |b|), and to recover
-          <span class="sym">θ</span> you feed that ratio to arccos — which only
-          accepts inputs between −1 and 1. Cauchy–Schwarz is exactly the promise
-          that the ratio never escapes that range, in any number of dimensions.
-          You cannot picture the angle between two thousand-component vectors,
-          but the inequality guarantees there is one to talk about. Every time a
-          search engine or recommender compares two embeddings by cosine
-          similarity, that is the guarantee it is standing on.
+          Both are derived, and their consequences worked through, in
+          <a href="../../appendix/trigonometry/#inequalities">Appendix:
+          Trigonometry</a> — they belong next to the theorem they lean on.
         </p>
       </section>
     </div>

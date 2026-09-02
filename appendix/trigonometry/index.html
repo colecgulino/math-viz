@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Appendix: Trigonometry — math-viz</title>
+    <meta
+      name="description"
+      content="Sine, cosine and the Pythagorean theorem from first principles, with the two inequalities that follow from them."
+    />
+    <link rel="stylesheet" href="../../assets/theme.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23efe5d5'/><circle cx='16' cy='16' r='7.5' fill='none' stroke='%23bf5b2e' stroke-width='2.5'/></svg>"
+    />
+    <style>
+      /* ---- explainer prose ---- */
+      .jump {
+        display: inline-block;
+        margin-top: 18px;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .jump:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .explainer {
+        padding-block: 10px 6px;
+      }
+      .explainer > section + section {
+        margin-top: 46px;
+      }
+      .explainer h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+      }
+      .explainer h3 {
+        font-size: 1.02rem;
+        margin: 30px 0 12px;
+        color: var(--clay-600);
+      }
+      .explainer p {
+        max-width: var(--measure);
+        margin: 0 0 17px;
+      }
+      .explainer figure {
+        margin: 26px 0 28px;
+        max-width: 800px;
+      }
+      .explainer figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .two-up {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+      }
+      .two-up figcaption {
+        grid-column: 1 / -1;
+      }
+      .one-up {
+        max-width: 400px;
+      }
+      .fig-cap {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-500);
+        text-align: center;
+        margin: 12px 0 0 !important;
+      }
+      .explainer figcaption {
+        max-width: var(--measure);
+        margin-top: 14px;
+        font-size: 0.86rem;
+        color: var(--ink-400);
+      }
+      .sym {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-900);
+      }
+      .calc {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        line-height: 1.9;
+        color: var(--ink-900);
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        max-width: var(--measure);
+        overflow-x: auto;
+      }
+      .calc .muted {
+        color: var(--ink-400);
+      }
+      .calc b {
+        color: var(--clay-600);
+        font-weight: 500;
+      }
+      .muted-note {
+        color: var(--ink-400);
+      }
+      @media (max-width: 660px) {
+        .two-up {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+      }
+
+      /* ---- the three ratios ---- */
+      .ratios {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+        gap: 14px;
+        max-width: var(--measure);
+        margin: 0 0 22px;
+        padding: 0;
+        list-style: none;
+      }
+      .ratio-card {
+        background: var(--sand-100);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+      }
+      .ratio-name {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--clay-600);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .ratio-eq {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        color: var(--ink-900);
+      }
+      .ratio-say {
+        font-size: 0.8rem;
+        color: var(--ink-400);
+        margin: 6px 0 0;
+        line-height: 1.45;
+      }
+
+      /* ---- board ---- */
+      .board-wrap {
+        position: relative;
+      }
+      #board {
+        touch-action: none;
+      }
+      #grid line {
+        stroke: var(--grid-line);
+        stroke-width: 1;
+      }
+      #axes .axis {
+        stroke: var(--axis-line);
+        stroke-width: 1.4;
+      }
+      .tick {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        fill: var(--ink-400);
+        text-anchor: middle;
+      }
+      .sidelabel {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 17px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+      }
+      .sqlabel {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: none;
+      }
+      .handle {
+        fill: transparent;
+        cursor: grab;
+      }
+      .handle:active {
+        cursor: grabbing;
+      }
+      .handle-ring {
+        fill: none;
+        stroke-width: 1.5;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 110ms ease;
+      }
+      .handle:hover + .handle-ring,
+      .handle:focus-visible + .handle-ring {
+        opacity: 0.6;
+      }
+      .hint {
+        position: absolute;
+        left: 50%;
+        bottom: 14px;
+        transform: translateX(-50%);
+        margin: 0;
+        font-size: 0.83rem;
+        color: var(--ink-400);
+        background: rgba(246, 239, 227, 0.92);
+        border: var(--border);
+        border-radius: 999px;
+        padding: 4px 13px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .hint[hidden] {
+        display: none;
+      }
+
+      /* ---- panels ---- */
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--ink-400);
+      }
+      .stats span:nth-child(even) {
+        color: var(--ink-900);
+        text-align: right;
+      }
+      .pyth {
+        font-family: var(--font-mono);
+        font-size: 0.84rem;
+        color: var(--ink-500);
+        border-top: var(--border);
+        margin-top: 13px;
+        padding-top: 13px;
+        line-height: 1.85;
+      }
+      .pyth b {
+        color: var(--ink-900);
+        font-weight: 500;
+      }
+
+      /* Two bars drawn to scale: the ratio is the length difference. */
+      .rbar {
+        margin-bottom: 15px;
+      }
+      .rbar-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--ink-400);
+        margin-bottom: 6px;
+      }
+      .rbar-head b {
+        color: var(--clay-600);
+        font-weight: 500;
+        font-size: 0.86rem;
+      }
+      .rbar-track {
+        display: grid;
+        gap: 4px;
+      }
+      .rbar-row {
+        display: grid;
+        grid-template-columns: 16px 1fr;
+        align-items: center;
+        gap: 7px;
+      }
+      .rbar-row i {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 0.86rem;
+        color: var(--ink-500);
+      }
+      .rbar-fill {
+        height: 9px;
+        border-radius: 5px;
+        min-width: 2px;
+      }
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 14px;
+      }
+      .toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        font-size: 0.86rem;
+        color: var(--ink-500);
+        cursor: pointer;
+      }
+      .toggle input {
+        accent-color: var(--clay-500);
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        flex: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topbar page"><a href="../../">&larr; Index</a></nav>
+
+    <header class="intro page">
+      <h1>Appendix: Trigonometry</h1>
+      <p>
+        Trigonometry is one idea stretched a long way: in a right triangle, the
+        shape is fixed by one angle, so the ratios between the sides depend on
+        that angle and nothing else. Name those ratios and you have sine and
+        cosine. Add the one theorem relating the sides and you have almost
+        everything the rest of this collection leans on.
+      </p>
+      <a class="jump" href="#tri-section">Skip to the board &darr;</a>
+    </header>
+
+    <div class="explainer page">
+      <section>
+        <h2>Ratios that only depend on the angle</h2>
+        <p>
+          Draw a right triangle with a chosen angle
+          <span class="sym">θ</span>. Now draw a bigger one with the same angle.
+          The two are similar — same shape, different size — so every side of
+          the second is the same multiple of the corresponding side of the
+          first. Which means the <em>ratios</em> between sides come out
+          identical in both.
+        </p>
+        <p>
+          That is the whole foundation. A ratio of two sides carries no
+          information about how big the triangle is, only about its shape, and
+          its shape is set by <span class="sym">θ</span>. So each ratio is a
+          function of the angle alone, and those functions deserve names.
+        </p>
+
+        <ul class="ratios">
+          <li class="ratio-card">
+            <span class="ratio-name">sine</span>
+            <span class="ratio-eq">sin θ = opp / hyp</span>
+            <p class="ratio-say">How much of the hypotenuse points across.</p>
+          </li>
+          <li class="ratio-card">
+            <span class="ratio-name">cosine</span>
+            <span class="ratio-eq">cos θ = adj / hyp</span>
+            <p class="ratio-say">How much of it points along.</p>
+          </li>
+          <li class="ratio-card">
+            <span class="ratio-name">tangent</span>
+            <span class="ratio-eq">tan θ = opp / adj</span>
+            <p class="ratio-say">The slope of the hypotenuse.</p>
+          </li>
+        </ul>
+
+        <p>
+          The clearest picture drops the triangle onto a circle of radius 1.
+          Then the hypotenuse is 1, dividing by it changes nothing, and the two
+          ratios become plain coordinates: a point at angle
+          <span class="sym">θ</span> on the unit circle sits at
+          (cos θ, sin θ).
+        </p>
+
+        <figure class="one-up">
+          <img
+            src="../../assets/figures/unit-circle.svg"
+            alt="A unit circle with a radius at angle theta, its horizontal leg labelled cosine and its vertical leg labelled sine."
+            width="364"
+            height="306"
+          />
+        </figure>
+
+        <p>
+          Reading trigonometry off that circle answers most questions without
+          any memorised table. Cosine starts at 1 and falls to 0 at a quarter
+          turn, because the point starts on the right and travels to the top.
+          Sine does the reverse. Both are trapped between −1 and 1 because the
+          point never leaves the circle — a fact that turns out to matter enough
+          to reappear at the end of this page. Past a quarter turn the point
+          crosses into the second quadrant, its x-coordinate goes negative, and
+          so does the cosine.
+        </p>
+        <p>
+          The circle also explains why these functions repeat. Go all the way
+          round and you are back where you started, so sine and cosine are
+          periodic with period 2π. Every wave you have ever seen plotted is this
+          point going round and round, with one coordinate graphed against time.
+        </p>
+      </section>
+
+      <section>
+        <h2>The Pythagorean theorem</h2>
+        <p>
+          One relation ties the three sides of a right triangle together. With
+          legs <span class="sym">a</span> and <span class="sym">b</span> and
+          hypotenuse <span class="sym">c</span>:
+        </p>
+        <div class="calc">a² + b² = c²</div>
+        <p>
+          It deserves more than a statement, because it is the reason distance
+          works the way it does, and because there is a proof you can see in a
+          single glance rather than follow line by line.
+        </p>
+
+        <h3>A proof you can see</h3>
+        <p>
+          Take four identical copies of the right triangle and a square whose
+          side is <span class="sym">a</span> + <span class="sym">b</span>. Pack
+          the four triangles into the corners, each rotated a quarter turn from
+          the last. What is left in the middle is a tilted square, and its side
+          is the hypotenuse <span class="sym">c</span>.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/pythag-c.svg"
+              alt="A square of side a plus b holding four right triangles at its corners, with a tilted square of side c left in the middle."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">leftover = c²</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/pythag-ab.svg"
+              alt="The same square holding the same four triangles rearranged, leaving a square of side a and a square of side b."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">leftover = a² + b²</p>
+          </div>
+          <figcaption>
+            The same outer square and the same four triangles, packed two ways.
+            Whatever is not triangle has to be the same area in both.
+          </figcaption>
+        </figure>
+
+        <p>
+          Now slide the four triangles into the other arrangement — two of them
+          paired into a rectangle in one corner, two into a rectangle in the
+          other. The outer square has not changed and neither have the
+          triangles, but the empty space has rearranged itself into two squares:
+          one of side <span class="sym">a</span> and one of side
+          <span class="sym">b</span>.
+        </p>
+        <div class="calc">
+          (a + b)² &nbsp;=&nbsp; 4 · ½ab &nbsp;+&nbsp; <b>c²</b>
+          <span class="muted">&nbsp;&nbsp;first packing</span><br />
+          (a + b)² &nbsp;=&nbsp; 4 · ½ab &nbsp;+&nbsp; <b>a² + b²</b>
+          <span class="muted">&nbsp;&nbsp;second packing</span><br /><br />
+          ⟹ &nbsp;a² + b² = c²
+        </div>
+        <p>
+          Same container, same four pieces, so the uncovered area is the same
+          both times. No algebra beyond subtracting the triangles from both
+          sides. The theorem is a statement about
+          <em>areas</em> before it is a statement about lengths, which is why
+          the squares in the name are literal squares.
+        </p>
+
+        <h3>Why it is everywhere</h3>
+        <p>
+          Put the triangle on a coordinate grid with the right angle at the
+          origin and the theorem becomes the distance formula: a point at
+          (x, y) sits √(x² + y²) from the origin. That is not an analogy — the
+          legs <em>are</em> the coordinates. Every length computed anywhere in
+          this collection traces back to it.
+        </p>
+        <p>
+          It also hides inside the unit circle. The point (cos θ, sin θ) is one
+          unit from the origin by construction, so applying the theorem to the
+          little triangle under it gives:
+        </p>
+        <div class="calc">cos²θ + sin²θ = 1</div>
+        <p>
+          Usually called the Pythagorean identity, and named accurately: it is
+          not a separate fact to memorise, it is the theorem applied to a
+          triangle whose hypotenuse happens to be 1. Anywhere you see that
+          identity used, Pythagoras is doing the work.
+        </p>
+        <p>
+          And it is what makes
+          <a href="../../linear-algebra/dot-products/">length from a dot
+          product</a> possible: |v| = √(v · v) is the theorem written without
+          reference to triangles, which is how distance survives into
+          dimensions you cannot draw.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="tri-section">
+      <div class="plate">
+        <div class="board-wrap">
+          <svg
+            id="board"
+            viewBox="0 0 704 528"
+            aria-label="A draggable right triangle with squares on its sides"
+          >
+            <g id="grid"></g>
+            <g id="axes"></g>
+            <g id="squares"></g>
+            <g id="tri"></g>
+            <g id="handles"></g>
+          </svg>
+          <p class="hint" id="hint">Drag either corner.</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>The triangle</h2>
+          <div class="stats">
+            <span>a &nbsp;<span class="muted-note">(along)</span></span
+            ><span id="va"></span>
+            <span>b &nbsp;<span class="muted-note">(across)</span></span
+            ><span id="vb"></span>
+            <span>c &nbsp;<span class="muted-note">(hypotenuse)</span></span
+            ><span id="vc"></span>
+            <span>angle θ</span><span id="vt"></span>
+          </div>
+          <p class="pyth" id="pyth"></p>
+          <label class="toggle">
+            <input type="checkbox" id="show-sq" checked />
+            Show the squares
+          </label>
+          <div class="btnrow">
+            <button class="btn" type="button" data-p="3,4">3–4–5</button>
+            <button class="btn" type="button" data-p="4,3">4–3–5</button>
+            <button class="btn" type="button" data-p="2,2">45°</button>
+            <button class="btn" type="button" data-p="4,1">shallow</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Ratios</h2>
+          <div class="rbar">
+            <div class="rbar-head"><span>c / a</span><b id="rca"></b></div>
+            <div class="rbar-track">
+              <div class="rbar-row">
+                <i>c</i>
+                <div class="rbar-fill" id="bar-c1" style="background: #2f2a25"></div>
+              </div>
+              <div class="rbar-row">
+                <i>a</i>
+                <div class="rbar-fill" id="bar-a" style="background: #bf5b2e"></div>
+              </div>
+            </div>
+            <p class="ratio-say" id="say-ca"></p>
+          </div>
+
+          <div class="rbar" style="margin-bottom: 0">
+            <div class="rbar-head"><span>c / b</span><b id="rcb"></b></div>
+            <div class="rbar-track">
+              <div class="rbar-row">
+                <i>c</i>
+                <div class="rbar-fill" id="bar-c2" style="background: #2f2a25"></div>
+              </div>
+              <div class="rbar-row">
+                <i>b</i>
+                <div class="rbar-fill" id="bar-b" style="background: #5f7161"></div>
+              </div>
+            </div>
+            <p class="ratio-say" id="say-cb"></p>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="explainer page">
+      <section>
+        <h2>Reading the board</h2>
+        <p>
+          The two legs are drawn as vectors laid tip to tail:
+          <span class="sym">a</span> runs along, then
+          <span class="sym">b</span> runs across from where it ends, and the
+          hypotenuse from start to finish is their sum. The right triangle and
+          the vector sum <span class="sym">a</span> + <span class="sym">b</span>
+          are the same picture — which is why the
+          <a href="../../linear-algebra/linear-combinations/">tip-to-tail walk</a>
+          and Pythagoras keep turning up together.
+        </p>
+        <p>
+          With the squares switched on you can watch the theorem hold as a
+          running total: the clay square and the sage square always add up to
+          the ochre one, whatever you drag the corners to. The panel prints the
+          same equation numerically.
+        </p>
+        <p>
+          The two bars compare the hypotenuse against each leg. Since
+          <span class="sym">c</span> is the longest side of a right triangle,
+          both ratios always exceed 1, and each is the reciprocal of a familiar
+          function: c / a = 1 / cos θ and c / b = 1 / sin θ. Watch what happens
+          as you flatten the triangle. Shrink <span class="sym">b</span> toward
+          zero and c / a settles down to 1 — the hypotenuse and the along-leg
+          become the same segment — while c / b runs away without limit, because
+          you are dividing by something vanishing. The blow-up is the honest
+          signal that sin θ → 0.
+        </p>
+      </section>
+
+      <section id="inequalities">
+        <h2>Two inequalities that follow</h2>
+        <p>
+          Put the dot product and the length formula together and two bounds
+          appear. They look like technicalities. They are the reason any of the
+          preceding vocabulary is allowed to exist.
+        </p>
+
+        <h3>Cauchy–Schwarz</h3>
+        <div class="calc">|a · b| &nbsp;≤&nbsp; |a| |b|</div>
+        <p>
+          The geometric formula makes this nearly self-evident:
+          a · b = |a| |b| cos θ, and cos θ never escapes the band between −1 and
+          1 — which is the entire content of the cosine curve under the
+          <a href="../../linear-algebra/dot-products/">dot products</a> board.
+          Multiply through and the product of two vectors can never exceed the
+          product of their lengths.
+        </p>
+        <p>
+          The picture says it even faster. The shadow of
+          <span class="sym">a</span> on <span class="sym">b</span> has length
+          |a| |cos θ|, and a shadow is never longer than the thing casting it.
+          Multiply both sides of |shadow| ≤ |a| by |b| and you have the
+          inequality.
+        </p>
+        <p>
+          Deriving it without leaning on the angle takes one more step, and is
+          worth seeing because it never mentions geometry at all. Pick any
+          number <span class="sym">t</span>, slide
+          <span class="sym">t</span><span class="sym">b</span> along
+          <span class="sym">b</span>'s line, and look at what is left over. It's
+          a vector, so its squared length cannot be negative:
+        </p>
+        <div class="calc">
+          |a − tb|² &nbsp;=&nbsp; (a − tb) · (a − tb)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;
+          |a|² − 2t(a · b) + t²|b|² &nbsp;≥&nbsp; 0
+        </div>
+        <p>
+          That is a quadratic in <span class="sym">t</span> that never dips
+          below zero, so it cannot cross the axis twice, so its discriminant is
+          at most zero:
+        </p>
+        <div class="calc">
+          4(a · b)² − 4|a|²|b|² &nbsp;≤&nbsp; 0<br />
+          (a · b)² &nbsp;≤&nbsp; |a|²|b|² <span class="muted">→</span>
+          |a · b| &nbsp;≤&nbsp; |a| |b|
+        </div>
+        <p>
+          <span class="muted-note"
+            >(If <span class="sym">b</span> is the zero vector both sides are
+            zero and there is nothing to prove.)</span
+          >
+          The <span class="sym">t</span> that minimises that quadratic works out
+          to (a · b)/|b|² — precisely the coefficient that produces the shadow on
+          the board. So the algebra is doing exactly what the picture does:
+          subtract off the shadow, then note that whatever sticks out sideways
+          still has a length, and lengths are never negative. Equality happens
+          when nothing sticks out — when <span class="sym">a</span> is a multiple
+          of <span class="sym">b</span>.
+        </p>
+
+        <h3>The triangle inequality</h3>
+        <div class="calc">|a + b| &nbsp;≤&nbsp; |a| + |b|</div>
+        <p>
+          Expand a sum the same way, using
+          <span class="sym">v</span> · <span class="sym">v</span> = |v|²:
+        </p>
+        <div class="calc">
+          |a + b|² &nbsp;=&nbsp; (a + b) · (a + b) &nbsp;=&nbsp;
+          |a|² + 2(a · b) + |b|²
+        </div>
+        <p>
+          Cauchy–Schwarz caps that middle term at |a| |b|, and the rest is a
+          perfect square:
+        </p>
+        <div class="calc">
+          |a + b|² &nbsp;≤&nbsp; |a|² + 2|a| |b| + |b|² &nbsp;=&nbsp;
+          (|a| + |b|)²
+        </div>
+        <p>
+          Both sides are non-negative, so taking square roots preserves the
+          inequality and the result follows.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/triangle-strict.svg"
+              alt="Vectors a and b laid tip to tail, with the shorter direct arrow a plus b closing the triangle."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">|a + b| &lt; |a| + |b|</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/triangle-equality.svg"
+              alt="Two parallel vectors laid tip to tail, where the triangle collapses flat onto a line."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">|a + b| = |a| + |b|</p>
+          </div>
+          <figcaption>
+            The detour and the direct route, and the one case where they agree.
+          </figcaption>
+        </figure>
+
+        <p>
+          The name carries the intuition. Lay <span class="sym">a</span> and
+          <span class="sym">b</span> tip to tail — the same walk the
+          <a href="../../linear-algebra/linear-combinations/">linear combinations</a> board draws
+          — and <span class="sym">a</span> + <span class="sym">b</span> is the
+          direct arrow from start to finish. The inequality says the direct
+          route is never longer than the detour. The two agree only when the
+          detour isn't one: when the vectors point the same way and the triangle
+          flattens onto a line.
+        </p>
+
+        <h3>Why they matter</h3>
+        <p>
+          These two bounds are what promote |v| = √(v · v) from a formula into a
+          usable notion of distance. Define the distance between two points as
+          |u − v| and the triangle inequality becomes the promise that you can
+          never get somewhere faster by detouring through a third point. A
+          "distance" without that guarantee would tell you nothing.
+        </p>
+        <p>
+          Cauchy–Schwarz does the same job for angle. Rearranged, the geometric
+          formula reads cos θ = (a · b) / (|a| |b|), and to recover
+          <span class="sym">θ</span> you feed that ratio to arccos — which only
+          accepts inputs between −1 and 1. Cauchy–Schwarz is exactly the promise
+          that the ratio never escapes that range, in any number of dimensions.
+          You cannot picture the angle between two thousand-component vectors,
+          but the inequality guarantees there is one to talk about. Every time a
+          search engine or recommender compares two embeddings by cosine
+          similarity, that is the guarantee it is standing on.
+        </p>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const $ = (id) => document.getElementById(id);
+        const CLAY = "#bf5b2e", SAGE = "#5f7161", OCHRE = "#c99a2e", INK = "#2f2a25";
+        const U = 34, OX = 320, OY = 350;
+        const LIM = 5, STEP = 0.5;
+
+        const sx = (x) => OX + U * x;
+        const sy = (y) => OY - U * y;
+
+        let a = 3, b = 4;
+
+        const snap = (v) =>
+          Math.max(STEP, Math.min(LIM, Math.round(v / STEP) * STEP));
+
+        function poly(pts, fill, stroke, op) {
+          const d = pts.map((p) => `${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(" L");
+          return `<path d="M${d} Z" fill="${fill}" fill-opacity="${op}" ` +
+            `stroke="${stroke}" stroke-width="1.5" stroke-opacity="0.75"/>`;
+        }
+
+        function arrow(x1, y1, x2, y2, color, w) {
+          const dx = sx(x2) - sx(x1), dy = sy(y2) - sy(y1);
+          const len = Math.hypot(dx, dy);
+          if (len < 2) return "";
+          const ux = dx / len, uy = dy / len;
+          const head = Math.min(13, len * 0.4);
+          const hw = head * 0.42;
+          const bx = sx(x2) - ux * head, by = sy(y2) - uy * head;
+          const px = -uy, py = ux;
+          const f = (n) => n.toFixed(1);
+          return (
+            `<line x1="${f(sx(x1))}" y1="${f(sy(y1))}" x2="${f(bx + ux)}" y2="${f(by + uy)}" ` +
+            `stroke="${color}" stroke-width="${w}" stroke-linecap="round"/>` +
+            `<path d="M${f(sx(x2))},${f(sy(y2))} L${f(bx + px * hw)},${f(by + py * hw)} ` +
+            `L${f(bx - px * hw)},${f(by - py * hw)} Z" fill="${color}"/>`
+          );
+        }
+
+        function buildGrid() {
+          let g = "";
+          for (let x = -6; x <= 11; x++)
+            g += `<line x1="${sx(x)}" y1="${sy(-6)}" x2="${sx(x)}" y2="${sy(11)}"/>`;
+          for (let y = -6; y <= 11; y++)
+            g += `<line x1="${sx(-6)}" y1="${sy(y)}" x2="${sx(11)}" y2="${sy(y)}"/>`;
+          $("grid").innerHTML = g;
+          $("axes").innerHTML =
+            `<line class="axis" x1="${sx(-6)}" y1="${sy(0)}" x2="${sx(11)}" y2="${sy(0)}"/>` +
+            `<line class="axis" x1="${sx(0)}" y1="${sy(-6)}" x2="${sx(0)}" y2="${sy(11)}"/>`;
+        }
+
+        function draw() {
+          const c = Math.hypot(a, b);
+          const showSq = $("show-sq").checked;
+
+          // O -> P along a, P -> Q across b, hypotenuse O -> Q
+          const O = [0, 0], Pp = [a, 0], Q = [a, b];
+
+          let sq = "";
+          if (showSq) {
+            // square on a, dropped below the along-leg
+            sq += poly([[0, 0], [a, 0], [a, -a], [0, -a]], CLAY, CLAY, 0.18);
+            // square on b, pushed out to the right of the across-leg
+            sq += poly([[a, 0], [a + b, 0], [a + b, b], [a, b]], SAGE, SAGE, 0.18);
+            // square on c, on the far side of the hypotenuse from the triangle
+            const nx = -b / c, ny = a / c;
+            sq += poly(
+              [[0, 0], [a, b], [a + nx * c, b + ny * c], [nx * c, ny * c]],
+              OCHRE, OCHRE, 0.18
+            );
+            const lab = (p, t, col) =>
+              `<text class="sqlabel" x="${sx(p[0]).toFixed(1)}" y="${sy(p[1]).toFixed(1)}" ` +
+              `fill="${col}">${t}</text>`;
+            sq += lab([a / 2, -a / 2], `a² = ${(a * a).toFixed(2).replace(/\.?0+$/, "")}`, CLAY);
+            sq += lab([a + b / 2, b / 2], `b² = ${(b * b).toFixed(2).replace(/\.?0+$/, "")}`, SAGE);
+            sq += lab(
+              [a / 2 + (nx * c) / 2, b / 2 + (ny * c) / 2],
+              `c² = ${(c * c).toFixed(2).replace(/\.?0+$/, "")}`, OCHRE
+            );
+          }
+          $("squares").innerHTML = sq;
+
+          // right-angle marker at P, opening back toward O and up toward Q
+          const m = 0.3;
+          let t =
+            `<path d="M${sx(a - m)},${sy(0)} L${sx(a - m)},${sy(m)} L${sx(a)},${sy(m)}" ` +
+            `fill="none" stroke="var(--ink-400)" stroke-width="1.4"/>`;
+          // the angle arc at the origin
+          const r = 0.85, ang = Math.atan2(b, a);
+          t += `<path d="M${sx(r)},${sy(0)} A${(r * U).toFixed(1)} ${(r * U).toFixed(1)} 0 0 0 ` +
+            `${sx(r * Math.cos(ang)).toFixed(1)},${sy(r * Math.sin(ang)).toFixed(1)}" ` +
+            `fill="none" stroke="var(--ink-400)" stroke-width="1.4"/>`;
+          t += `<text class="sqlabel" x="${sx(1.18 * Math.cos(ang / 2)).toFixed(1)}" ` +
+            `y="${sy(1.18 * Math.sin(ang / 2)).toFixed(1)}" fill="var(--ink-500)">θ</text>`;
+
+          t += arrow(0, 0, a, b, INK, 3.2);
+          t += arrow(0, 0, a, 0, CLAY, 3);
+          t += arrow(a, 0, a, b, SAGE, 3);
+          const L = (p, txt, col) =>
+            `<text class="sidelabel" x="${sx(p[0]).toFixed(1)}" y="${sy(p[1]).toFixed(1)}" ` +
+            `fill="${col}">${txt}</text>`;
+          t += L([a / 2, 0.34], "a", CLAY);
+          t += L([a - 0.36, b / 2], "b", SAGE);
+          t += L([a / 2 - 0.44, b / 2 + 0.3], "c", INK);
+          $("tri").innerHTML = t;
+
+          $("handles").innerHTML =
+            `<circle class="handle" data-h="a" cx="${sx(a)}" cy="${sy(0)}" r="15" ` +
+            `tabindex="0" role="button" aria-label="Drag side a"/>` +
+            `<circle class="handle-ring" cx="${sx(a)}" cy="${sy(0)}" r="10" stroke="${CLAY}"/>` +
+            `<circle class="handle" data-h="q" cx="${sx(a)}" cy="${sy(b)}" r="15" ` +
+            `tabindex="0" role="button" aria-label="Drag the apex"/>` +
+            `<circle class="handle-ring" cx="${sx(a)}" cy="${sy(b)}" r="10" stroke="${INK}"/>`;
+
+          readout(c);
+        }
+
+        const trim = (n) => n.toFixed(3).replace(/\.?0+$/, "");
+
+        function readout(c) {
+          $("va").textContent = trim(a);
+          $("vb").textContent = trim(b);
+          $("vc").textContent = c.toFixed(3);
+          $("vt").textContent = ((Math.atan2(b, a) * 180) / Math.PI).toFixed(1) + "°";
+          $("pyth").innerHTML =
+            `a² + b² = ${trim(a * a)} + ${trim(b * b)} = <b>${trim(a * a + b * b)}</b><br />` +
+            `c² = <b>${trim(c * c)}</b>`;
+
+          const ca = c / a, cb = c / b;
+          $("rca").textContent = ca.toFixed(3);
+          $("rcb").textContent = cb.toFixed(3);
+          // Bars are drawn to scale against the longest side on show, which is
+          // always c, so the shorter bar's length *is* the ratio.
+          $("bar-c1").style.width = "100%";
+          $("bar-c2").style.width = "100%";
+          $("bar-a").style.width = ((a / c) * 100).toFixed(1) + "%";
+          $("bar-b").style.width = ((b / c) * 100).toFixed(1) + "%";
+          $("say-ca").textContent =
+            `c is ${ca.toFixed(2)}× the length of a  ·  a / c = cos θ = ${(a / c).toFixed(3)}`;
+          $("say-cb").textContent =
+            `c is ${cb.toFixed(2)}× the length of b  ·  b / c = sin θ = ${(b / c).toFixed(3)}`;
+        }
+
+        // --- input ---
+        const board = $("board");
+        function toBoard(e) {
+          const r = board.getBoundingClientRect();
+          const k = 704 / r.width;
+          return {
+            x: ((e.clientX - r.left) * k - OX) / U,
+            y: (OY - (e.clientY - r.top) * k) / U,
+          };
+        }
+
+        let drag = null;
+        board.addEventListener("pointerdown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          drag = h.dataset.h;
+          h.setPointerCapture(e.pointerId);
+          $("hint").hidden = true;
+          e.preventDefault();
+        });
+        board.addEventListener("pointermove", (e) => {
+          if (!drag) return;
+          const p = toBoard(e);
+          const na = snap(p.x);
+          const nb = drag === "q" ? snap(p.y) : b;
+          if (na === a && nb === b) return;
+          a = na;
+          b = nb;
+          draw();
+        });
+        const stop = () => (drag = null);
+        board.addEventListener("pointerup", stop);
+        board.addEventListener("pointercancel", stop);
+
+        board.addEventListener("keydown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          const d = {
+            ArrowLeft: [-STEP, 0], ArrowRight: [STEP, 0],
+            ArrowUp: [0, STEP], ArrowDown: [0, -STEP],
+          }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          a = snap(a + d[0]);
+          if (h.dataset.h === "q") b = snap(b + d[1]);
+          draw();
+          const again = $("handles").querySelector(`.handle[data-h="${h.dataset.h}"]`);
+          if (again) again.focus();
+        });
+
+        $("show-sq").addEventListener("change", draw);
+        document.querySelectorAll("[data-p]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const [na, nb] = btn.dataset.p.split(",").map(Number);
+            a = na;
+            b = nb;
+            draw();
+          });
+        });
+
+        buildGrid();
+        draw();
+      })();
+    </script>
+  </body>
+</html>

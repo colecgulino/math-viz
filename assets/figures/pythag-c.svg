@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 364 306" width="364" height="306" role="img" aria-label="Four right triangles in a square of side a plus b, leaving a tilted square of side c">
+  <rect x="0.5" y="0.5" width="363" height="305" rx="10" fill="#f6efe3" stroke="#d9c9ae" stroke-width="1"/>
+  <path d="M52,282 L312,282 L312,22 L52,22 Z" fill="none" stroke="#8a8074" stroke-width="1.4"/>
+  <path d="M208.0,282.0 L312.0,126.0 L156.0,22.0 L52.0,178.0 Z" fill="#c99a2e" fill-opacity="0.2" stroke="#c99a2e" stroke-width="1.5" stroke-opacity="0.8"/>
+  <rect x="168.8" y="142.0" width="26.4" height="20.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="182.0" y="152.0" fill="#c99a2e" font-family="ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace" font-size="14" text-anchor="middle" dominant-baseline="middle">c²</text>
+  <path d="M52.0,282.0 L208.0,282.0 L52.0,178.0 Z" fill="#8c6239" fill-opacity="0.22" stroke="#8c6239" stroke-width="1.2" stroke-opacity="0.7"/>
+  <path d="M208.0,282.0 L312.0,282.0 L312.0,126.0 Z" fill="#8c6239" fill-opacity="0.22" stroke="#8c6239" stroke-width="1.2" stroke-opacity="0.7"/>
+  <path d="M312.0,126.0 L312.0,22.0 L156.0,22.0 Z" fill="#8c6239" fill-opacity="0.22" stroke="#8c6239" stroke-width="1.2" stroke-opacity="0.7"/>
+  <path d="M156.0,22.0 L52.0,22.0 L52.0,178.0 Z" fill="#8c6239" fill-opacity="0.22" stroke="#8c6239" stroke-width="1.2" stroke-opacity="0.7"/>
+  <rect x="122.1" y="290.2" width="15.8" height="19.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="130.0" y="299.7" fill="#bf5b2e" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="13" text-anchor="middle" dominant-baseline="middle" font-style="italic">a</text>
+  <rect x="252.1" y="290.2" width="15.8" height="19.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="260.0" y="299.7" fill="#5f7161" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="13" text-anchor="middle" dominant-baseline="middle" font-style="italic">b</text>
+</svg>

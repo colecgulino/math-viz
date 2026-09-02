@@ -388,6 +388,96 @@ def plate_at(u, ox, oy, cells_x, cells_y):
     return out
 
 
+# ------------------------------------------------------------- trigonometry
+def _tri(pts, fill_op=0.22):
+    d = " L".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+    return (f'<path d="M{d} Z" fill="{P["umber"]}" fill-opacity="{fill_op}" '
+            f'stroke="{P["umber"]}" stroke-width="1.2" stroke-opacity="0.7"/>')
+
+
+def _sq(pts, colour, label, lab_at, size=14):
+    d = " L".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+    return [
+        f'<path d="M{d} Z" fill="{colour}" fill-opacity="0.2" '
+        f'stroke="{colour}" stroke-width="1.5" stroke-opacity="0.8"/>',
+        text(lab_at[0], lab_at[1], label, colour, size, boxed=BG),
+    ]
+
+
+def pythag_c():
+    """Four triangles in an (a+b) square, leaving a tilted c-square."""
+    u, ox, oy = 52, 52, 282   # side 5 -> 260px
+    def V(x, y):
+        return (ox + u * x, oy - u * y)
+    a, b = 3, 2
+    body = [f'<rect x="0.5" y="0.5" width="{PW - 1}" height="{PH - 1}" rx="10" '
+            f'fill="{P["sand100"]}" stroke="{P["sand400"]}" stroke-width="1"/>']
+    body.append(f'<path d="M{V(0,0)[0]},{V(0,0)[1]} L{V(5,0)[0]},{V(5,0)[1]} '
+                f'L{V(5,5)[0]},{V(5,5)[1]} L{V(0,5)[0]},{V(0,5)[1]} Z" fill="none" '
+                f'stroke="{P["ink400"]}" stroke-width="1.4"/>')
+    body += _sq([V(3,0), V(5,3), V(2,5), V(0,2)], P["ochre"], "c²", V(2.5, 2.5))
+    for t in ([V(0,0), V(3,0), V(0,2)], [V(3,0), V(5,0), V(5,3)],
+              [V(5,3), V(5,5), V(2,5)], [V(2,5), V(0,5), V(0,2)]):
+        body.append(_tri(t))
+    body.append(text(*V(1.5, -0.34), "a", P["clay"], 13, "serif", italic=True, boxed=BG))
+    body.append(text(*V(4, -0.34), "b", P["sage"], 13, "serif", italic=True, boxed=BG))
+    write_svg("assets/figures/pythag-c.svg",
+              svg_doc(PW, PH, body, "Four right triangles in a square of side a plus b, leaving a tilted square of side c"))
+
+
+def pythag_ab():
+    """The same four triangles rearranged, leaving an a-square and a b-square."""
+    u, ox, oy = 52, 52, 282
+    def V(x, y):
+        return (ox + u * x, oy - u * y)
+    body = [f'<rect x="0.5" y="0.5" width="{PW - 1}" height="{PH - 1}" rx="10" '
+            f'fill="{P["sand100"]}" stroke="{P["sand400"]}" stroke-width="1"/>']
+    body.append(f'<path d="M{V(0,0)[0]},{V(0,0)[1]} L{V(5,0)[0]},{V(5,0)[1]} '
+                f'L{V(5,5)[0]},{V(5,5)[1]} L{V(0,5)[0]},{V(0,5)[1]} Z" fill="none" '
+                f'stroke="{P["ink400"]}" stroke-width="1.4"/>')
+    body += _sq([V(0,0), V(3,0), V(3,3), V(0,3)], P["clay"], "a²", V(1.5, 1.5))
+    body += _sq([V(3,3), V(5,3), V(5,5), V(3,5)], P["sage"], "b²", V(4, 4))
+    for t in ([V(3,0), V(5,0), V(5,3)], [V(3,0), V(5,3), V(3,3)],
+              [V(0,3), V(3,3), V(3,5)], [V(0,3), V(3,5), V(0,5)]):
+        body.append(_tri(t))
+    write_svg("assets/figures/pythag-ab.svg",
+              svg_doc(PW, PH, body, "The same four triangles rearranged, leaving squares of side a and side b"))
+
+
+def unit_circle():
+    """sin and cos read straight off the unit circle."""
+    import math
+    u, ox, oy = 92, 176, 168
+    def V(x, y):
+        return (ox + u * x, oy - u * y)
+    th = 0.9
+    cx, sy = math.cos(th), math.sin(th)
+    body = [f'<rect x="0.5" y="0.5" width="{PW - 1}" height="{PH - 1}" rx="10" '
+            f'fill="{P["sand100"]}" stroke="{P["sand400"]}" stroke-width="1"/>']
+    for g in (-1, 1):
+        body.append(line(V(g, -1.4), V(g, 1.4), P["grid"], 1.0))
+        body.append(line(V(-1.4, g), V(1.4, g), P["grid"], 1.0))
+    body.append(line(V(-1.5, 0), V(1.5, 0), P["axis"], 1.3))
+    body.append(line(V(0, -1.4), V(0, 1.4), P["axis"], 1.3))
+    body.append(f'<circle cx="{V(0,0)[0]}" cy="{V(0,0)[1]}" r="{u}" fill="none" '
+                f'stroke="{P["umber"]}" stroke-width="1.8" stroke-opacity="0.75"/>')
+    body.append(line(V(cx, sy), V(cx, 0), P["sage"], 2.6, 0.95))
+    body.append(line(V(0, 0), V(cx, 0), P["clay"], 2.6, 0.95))
+    body.append(right_angle(V(cx, 0), (0, -1), (-1, 0), 9, P["ink400"]))
+    body.append(arrow(V(0, 0), V(cx, sy), P["ink900"], 2.6))
+    body.append(f'<circle cx="{V(cx,sy)[0]}" cy="{V(cx,sy)[1]}" r="4.5" fill="{P["ink900"]}"/>')
+    body.append(f'<path d="M{V(0.34,0)[0]},{V(0.34,0)[1]} A31 31 0 0 0 '
+                f'{V(0.34*cx,0.34*sy)[0]:.1f},{V(0.34*cx,0.34*sy)[1]:.1f}" fill="none" '
+                f'stroke="{P["ink400"]}" stroke-width="1.3"/>')
+    body.append(text(*V(0.52, 0.18), "θ", P["ink500"], 13, boxed=BG))
+    body.append(text(*V(cx / 2, -0.2), "cos θ", P["clay"], 12, boxed=BG))
+    body.append(text(*V(cx + 0.33, sy / 2), "sin θ", P["sage"], 12, boxed=BG))
+    body.append(text(*V(0.14, 0.52), "1", P["ink900"], 12, boxed=BG))
+    body.append(text(*V(cx + 0.42, sy + 0.20), "(cos θ, sin θ)", P["ink500"], 11, boxed=BG))
+    write_svg("assets/figures/unit-circle.svg",
+              svg_doc(PW, PH, body, "The unit circle with cosine on the horizontal axis and sine on the vertical"))
+
+
 if __name__ == "__main__":
     standard_basis()
     custom_basis()
@@ -401,3 +491,6 @@ if __name__ == "__main__":
     transform_after()
     subspace_closed()
     subspace_open()
+    pythag_c()
+    pythag_ab()
+    unit_circle()
