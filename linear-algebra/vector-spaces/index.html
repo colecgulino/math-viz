@@ -175,6 +175,128 @@
         }
       }
 
+
+      /* ---- subspace gallery ---- */
+      .modes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-bottom: 4px;
+      }
+      .modes button {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        line-height: 1.3;
+        color: var(--ink-500);
+        background: transparent;
+        border: 1px solid var(--sand-400);
+        border-radius: 7px;
+        padding: 8px 5px;
+        cursor: pointer;
+        transition: border-color 120ms ease, color 120ms ease,
+          background-color 120ms ease;
+      }
+      .modes button:hover {
+        border-color: var(--clay-400);
+        color: var(--clay-600);
+      }
+      .modes button[aria-pressed="true"] {
+        border-color: var(--clay-500);
+        color: var(--clay-600);
+        background: rgba(191, 91, 46, 0.08);
+      }
+      .modes button:focus-visible {
+        outline: 2px solid var(--clay-500);
+        outline-offset: 2px;
+      }
+      /* .verdict and .verdict-sub are already defined for the span board
+         below; both panels share them. */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 3px 10px;
+        margin-left: 8px;
+        vertical-align: 2px;
+      }
+      .badge--yes {
+        color: #4c6350;
+        border: 1px solid #b9c8bc;
+        background: rgba(95, 113, 97, 0.09);
+      }
+      .badge--no {
+        color: var(--clay-600);
+        border: 1px solid var(--clay-200);
+        background: rgba(191, 91, 46, 0.07);
+      }
+      .checks {
+        display: grid;
+        grid-template-columns: 18px 1fr auto;
+        gap: 7px 9px;
+        align-items: baseline;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        border-top: var(--border);
+        padding-top: 13px;
+      }
+      .checks .mark {
+        font-size: 0.9rem;
+        text-align: center;
+      }
+      .checks .ok {
+        color: var(--sage, #5f7161);
+      }
+      .checks .bad {
+        color: var(--clay-600);
+      }
+      .checks .lbl {
+        color: var(--ink-400);
+      }
+      .checks .val {
+        color: var(--ink-900);
+        text-align: right;
+      }
+      .story {
+        font-size: 0.84rem;
+        color: var(--ink-500);
+        line-height: 1.55;
+        margin: 13px 0 0;
+        border-top: var(--border);
+        padding-top: 13px;
+      }
+      .control {
+        margin-top: 14px;
+      }
+      .control-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 4px;
+      }
+      .control label {
+        font-size: 0.9rem;
+        color: var(--ink-700);
+      }
+      .control output {
+        font-family: var(--font-mono);
+        font-size: 0.84rem;
+        color: var(--clay-600);
+      }
+      #board2 {
+        touch-action: none;
+      }
+      #g2-grid line {
+        stroke: var(--grid-line);
+        stroke-width: 1;
+      }
+      #g2-axes .axis {
+        stroke: var(--axis-line);
+        stroke-width: 1.4;
+      }
+
       /* ---- board ---- */
       .board-wrap {
         position: relative;
@@ -650,8 +772,68 @@
       </aside>
     </div>
 
+    <div class="explainer page">
+      <section>
+        <h2>Which sets make the cut</h2>
+        <p>
+          The three conditions are quick to state and surprisingly fussy in
+          practice. Plenty of sets that look reasonable fail one of them, and
+          which one they fail is the interesting part — a set can be closed
+          under addition but not scaling, or the other way round, and either
+          miss is fatal.
+        </p>
+        <p>
+          The board below runs the test on six candidate sets. Pick one with the
+          buttons, then drag <span class="sym">u</span> and
+          <span class="sym">v</span> around inside it and watch where their sum
+          lands. The scalar slider does the same job for the second condition.
+          Anything that leaves the shaded region gets ringed.
+        </p>
+      </section>
+    </div>
+
+    <div class="stage page" id="gallery-section">
+      <div class="plate">
+        <div class="board-wrap">
+          <svg
+            id="board2"
+            viewBox="0 0 704 528"
+            aria-label="A candidate set in the plane, tested against the subspace conditions"
+          >
+            <g id="g2-region"></g>
+            <g id="g2-grid"></g>
+            <g id="g2-axes"></g>
+            <g id="g2-vecs"></g>
+            <g id="g2-handles"></g>
+          </svg>
+          <p class="hint" id="g2-hint">Drag u or v.</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>Candidate set</h2>
+          <div class="modes" id="g2-modes"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Verdict</h2>
+          <p class="verdict" id="g2-verdict"></p>
+          <p class="verdict-sub" id="g2-def"></p>
+          <div class="checks" id="g2-checks"></div>
+          <div class="control">
+            <div class="control-row">
+              <label for="g2-c">scalar c</label><output id="g2-c-out"></output>
+            </div>
+            <input id="g2-c" type="range" min="-3" max="3" step="0.5" value="-1" />
+          </div>
+          <p class="story" id="g2-story"></p>
+        </section>
+      </aside>
+    </div>
+
     <section class="notes page">
-      <h2>Reading the board</h2>
+      <h2>Reading the boards</h2>
       <p>
         The tinted region is the span — every vector you could reach by scaling
         the ones you placed and adding the results. With nothing placed, or with
@@ -678,6 +860,17 @@
         disc, or a half-plane. The span of any set is always a subspace, because
         it is built out of exactly the operations a subspace has to be closed
         under.
+      </p>
+      <p>
+        The second board runs the test the other way round: rather than
+        building a subspace out of generators, it hands you a candidate set and
+        asks whether it survives. The failures are the informative part. Two
+        opposite quadrants and the union of the two axes both scale perfectly
+        well and break on addition. The upper half-plane is the reverse — add
+        all day, but one negative scalar and you are out. The disc fails both,
+        and it fails them the way every bounded set does: closure under scaling
+        means a single non-zero member drags an entire infinite line in with
+        it, so nothing that fits inside a box can qualify.
       </p>
     </section>
 
@@ -977,6 +1170,338 @@
         buildGrid();
         addVector(3, 1);
         addVector(1, 3);
+      })();
+    </script>
+    <script>
+      (function () {
+        "use strict";
+
+        const $ = (id) => document.getElementById(id);
+        const U = 44, OX = 352, OY = 264;
+        const XMIN = -8, XMAX = 8, YMIN = -6, YMAX = 6;
+        const CLAY = "#bf5b2e", SAGE = "#5f7161", OCHRE = "#c99a2e", INK = "#2f2a25";
+        const UMBER = "#8c6239";
+
+        const sx = (x) => OX + U * x;
+        const sy = (y) => OY - U * y;
+        const lx = (v) => Math.max(14, Math.min(690, v));
+        const ly = (v) => Math.max(13, Math.min(515, v));
+        const rnd = (v, s) => Math.round(v / s) * s;
+        const clampX = (v) => Math.max(XMIN, Math.min(XMAX, v));
+        const clampY = (v) => Math.max(YMIN, Math.min(YMAX, v));
+
+        const rect = (x0, y0, x1, y1) =>
+          `<rect x="${sx(x0)}" y="${sy(y1)}" width="${(x1 - x0) * U}" ` +
+          `height="${(y1 - y0) * U}" fill="${OCHRE}" fill-opacity="0.22"/>`;
+
+        // Every mode is the same four things: what to draw, what counts as
+        // inside, where a dragged handle lands, and the story it tells.
+        const MODES = [
+          {
+            id: "line",
+            label: "line through 0",
+            title: "A line through the origin",
+            def: "W = { t(2, 1) : t ∈ ℝ }",
+            zero: true,
+            contains: (x, y) => Math.abs(x - 2 * y) < 1e-9,
+            snap(p) {
+              const t = rnd((p.x * 2 + p.y) / 5, 0.5);
+              return { x: clampX(2 * t), y: clampY(t) };
+            },
+            draw() {
+              const t = 40;
+              return (
+                `<line x1="${sx(-2 * t)}" y1="${sy(-t)}" x2="${sx(2 * t)}" y2="${sy(t)}" ` +
+                `stroke="${OCHRE}" stroke-width="18" stroke-opacity="0.24" stroke-linecap="round"/>` +
+                `<line x1="${sx(-2 * t)}" y1="${sy(-t)}" x2="${sx(2 * t)}" y2="${sy(t)}" ` +
+                `stroke="${OCHRE}" stroke-width="1.6" stroke-opacity="0.8" stroke-dasharray="7 6"/>`
+              );
+            },
+            u: { x: 2, y: 1 }, v: { x: 4, y: 2 }, c: -1,
+            story:
+              "The reference case. Scale a point on the line and you stay on it; add two and you stay on it. Every one-dimensional subspace of the plane looks like this.",
+          },
+          {
+            id: "diag",
+            label: "diagonal matrices",
+            title: "The 2×2 diagonal matrices",
+            def: "W = { diag(d₁, d₂) }",
+            axes: ["d₁", "d₂"],
+            matrix: true,
+            zero: true,
+            contains: () => true,
+            snap: (p) => ({ x: clampX(rnd(p.x, 1)), y: clampY(rnd(p.y, 1)) }),
+            draw: () => rect(XMIN, YMIN, XMAX, YMAX),
+            u: { x: 2, y: -1 }, v: { x: -3, y: 2 }, c: -1,
+            story:
+              "Read the two axes as the two diagonal entries: this whole plane is the set of 2×2 diagonal matrices, sitting inside the four-dimensional space of all 2×2 matrices. Adding two of them cannot wake an off-diagonal entry, because zero plus zero is zero, and neither can scaling. A subspace of dimension 2 inside one of dimension 4.",
+          },
+          {
+            id: "quad", failsAdd: true,
+            label: "two quadrants",
+            title: "Two opposite quadrants",
+            def: "W = { (x, y) : xy ≥ 0 }",
+            zero: true,
+            contains: (x, y) => x * y >= -1e-9,
+            snap: (p) => ({ x: clampX(rnd(p.x, 1)), y: clampY(rnd(p.y, 1)) }),
+            draw: () => rect(0, 0, XMAX, YMAX) + rect(XMIN, YMIN, 0, 0),
+            u: { x: 3, y: 1 }, v: { x: -1, y: -3 }, c: -1,
+            story:
+              "Scaling is fine — multiplying by a negative swaps the first quadrant for the third, and the set contains both. Addition is not. Take one point from each quadrant and the sum can land in the empty ones. Closed under scaling, open under addition: the exact mirror image of the all-negative set.",
+          },
+          {
+            id: "axes", failsAdd: true,
+            label: "union of the axes",
+            title: "The two axes together",
+            def: "W = { x = 0 } ∪ { y = 0 }",
+            zero: true,
+            contains: (x, y) => Math.abs(x) < 1e-9 || Math.abs(y) < 1e-9,
+            snap(p) {
+              return Math.abs(p.x) >= Math.abs(p.y)
+                ? { x: clampX(rnd(p.x, 1)), y: 0 }
+                : { x: 0, y: clampY(rnd(p.y, 1)) };
+            },
+            draw() {
+              const bar = (x1, y1, x2, y2) =>
+                `<line x1="${sx(x1)}" y1="${sy(y1)}" x2="${sx(x2)}" y2="${sy(y2)}" ` +
+                `stroke="${OCHRE}" stroke-width="18" stroke-opacity="0.24" stroke-linecap="round"/>`;
+              return (
+                bar(XMIN, 0, XMAX, 0) + bar(0, YMIN, 0, YMAX) +
+                `<line x1="${sx(XMIN)}" y1="${sy(0)}" x2="${sx(XMAX)}" y2="${sy(0)}" ` +
+                `stroke="${OCHRE}" stroke-width="1.6" stroke-opacity="0.8" stroke-dasharray="7 6"/>` +
+                `<line x1="${sx(0)}" y1="${sy(YMIN)}" x2="${sx(0)}" y2="${sy(YMAX)}" ` +
+                `stroke="${OCHRE}" stroke-width="1.6" stroke-opacity="0.8" stroke-dasharray="7 6"/>`
+              );
+            },
+            u: { x: 3, y: 0 }, v: { x: 0, y: 2 }, c: -1,
+            story:
+              "Each axis on its own is a perfectly good subspace. Their union is not, and this is the general lesson: a union of two subspaces is only a subspace when one already contains the other. Step off along one axis, then along the other, and you land in open country between them.",
+          },
+          {
+            id: "half", failsScale: true,
+            label: "upper half-plane",
+            title: "The upper half-plane",
+            def: "W = { (x, y) : y ≥ 0 }",
+            zero: true,
+            contains: (x, y) => y >= -1e-9,
+            snap: (p) => ({ x: clampX(rnd(p.x, 1)), y: clampY(rnd(p.y, 1)) }),
+            draw: () => rect(XMIN, 0, XMAX, YMAX),
+            u: { x: 2, y: 3 }, v: { x: -3, y: 1 }, c: -1,
+            story:
+              "Addition never fails here — two things pointing up add to something pointing up. Scaling does, the moment c goes negative: the vector flips through the origin and lands in the half you left out. This is the failure the all-negative matrices had, and it is why closure under scaling forces a subspace to be symmetric about the origin.",
+          },
+          {
+            id: "disc", failsScale: true, failsAdd: true,
+            label: "a disc",
+            title: "A disc around the origin",
+            def: "W = { (x, y) : x² + y² ≤ 9 }",
+            zero: true,
+            contains: (x, y) => x * x + y * y <= 9 + 1e-9,
+            snap: (p) => ({ x: clampX(rnd(p.x, 1)), y: clampY(rnd(p.y, 1)) }),
+            draw: () =>
+              `<circle cx="${sx(0)}" cy="${sy(0)}" r="${3 * U}" fill="${OCHRE}" ` +
+              `fill-opacity="0.22" stroke="${OCHRE}" stroke-width="1.6" ` +
+              `stroke-opacity="0.8" stroke-dasharray="7 6"/>`,
+            u: { x: 2, y: 2 }, v: { x: -2, y: 2 }, c: 2,
+            story:
+              "Note that c = −1 is safe: the disc is symmetric through the origin, so flipping stays inside. Push c past the edge and it fails anyway. Bounded sets can never be subspaces — closure under scaling means every non-zero member drags an entire infinite line along with it.",
+          },
+        ];
+
+        let mode = MODES[0];
+        let u = { ...mode.u }, v = { ...mode.v }, cval = mode.c;
+
+        function arrow(x1, y1, x2, y2, color, w, opts) {
+          const o = opts || {};
+          const ax = sx(x1), ay = sy(y1), bx2 = sx(x2), by2 = sy(y2);
+          const dx = bx2 - ax, dy = by2 - ay;
+          const len = Math.hypot(dx, dy);
+          if (len < 2) return "";
+          const ux = dx / len, uy = dy / len;
+          const head = Math.min(14, len * 0.42);
+          const hw = head * 0.4;
+          const bx = bx2 - ux * head, by = by2 - uy * head;
+          const px = -uy, py = ux;
+          const dash = o.dash ? ` stroke-dasharray="${o.dash}"` : "";
+          const op = o.opacity == null ? 1 : o.opacity;
+          const f = (n) => n.toFixed(1);
+          return (
+            `<line x1="${f(ax)}" y1="${f(ay)}" x2="${f(bx + ux)}" y2="${f(by + uy)}" ` +
+            `stroke="${color}" stroke-width="${w}" stroke-opacity="${op}" ` +
+            `stroke-linecap="round"${dash}/>` +
+            `<path d="M${f(bx2)},${f(by2)} L${f(bx + px * hw)},${f(by + py * hw)} ` +
+            `L${f(bx - px * hw)},${f(by - py * hw)} Z" fill="${color}" fill-opacity="${op}"/>`
+          );
+        }
+
+        function buildGrid() {
+          let g = "";
+          for (let x = XMIN; x <= XMAX; x++)
+            g += `<line x1="${sx(x)}" y1="${sy(YMIN)}" x2="${sx(x)}" y2="${sy(YMAX)}"/>`;
+          for (let y = YMIN; y <= YMAX; y++)
+            g += `<line x1="${sx(XMIN)}" y1="${sy(y)}" x2="${sx(XMAX)}" y2="${sy(y)}"/>`;
+          $("g2-grid").innerHTML = g;
+        }
+
+        function drawAxes() {
+          const n = mode.axes || ["x", "y"];
+          $("g2-axes").innerHTML =
+            `<line class="axis" x1="${sx(XMIN)}" y1="${sy(0)}" x2="${sx(XMAX)}" y2="${sy(0)}"/>` +
+            `<line class="axis" x1="${sx(0)}" y1="${sy(YMIN)}" x2="${sx(0)}" y2="${sy(YMAX)}"/>` +
+            `<text class="vlabel" x="${sx(XMAX) - 16}" y="${sy(0) + 20}" ` +
+            `fill="var(--ink-400)">${n[0]}</text>` +
+            `<text class="vlabel" x="${sx(0) + 20}" y="${sy(YMAX) + 16}" ` +
+            `fill="var(--ink-400)">${n[1]}</text>`;
+        }
+
+        const ring = (p, col) =>
+          `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="11" fill="none" ` +
+          `stroke="${col}" stroke-width="2"/>`;
+
+        function draw() {
+          $("g2-region").innerHTML = mode.draw();
+          drawAxes();
+
+          const sum = { x: u.x + v.x, y: u.y + v.y };
+          const cu = { x: cval * u.x, y: cval * u.y };
+          const inSum = mode.contains(sum.x, sum.y);
+          const inCu = mode.contains(cu.x, cu.y);
+
+          let s = "";
+          s += arrow(0, 0, cu.x, cu.y, UMBER, 2, { dash: "6 5", opacity: 0.9 });
+          s += arrow(0, 0, sum.x, sum.y, INK, 3);
+          s += arrow(0, 0, u.x, u.y, CLAY, 2.8);
+          s += arrow(0, 0, v.x, v.y, SAGE, 2.8);
+          if (!inSum) s += ring(sum, INK);
+          if (!inCu) s += ring(cu, UMBER);
+
+          const lab = (p, t, col, off) => {
+            const n = Math.hypot(p.x, p.y) || 1;
+            return `<text class="vlabel" x="${lx(sx(p.x + (p.x / n) * off))}" ` +
+              `y="${ly(sy(p.y + (p.y / n) * off))}" fill="${col}">${t}</text>`;
+          };
+          s += lab(u, "u", CLAY, 0.5);
+          s += lab(v, "v", SAGE, 0.5);
+          if (Math.hypot(sum.x, sum.y) > 0.3) s += lab(sum, "u + v", INK, 0.62);
+          if (Math.hypot(cu.x, cu.y) > 0.3) s += lab(cu, "cu", UMBER, 0.5);
+          $("g2-vecs").innerHTML = s;
+
+          $("g2-handles").innerHTML = [["u", u, CLAY], ["v", v, SAGE]]
+            .map(
+              ([k, p, col]) =>
+                `<circle class="handle" data-h="${k}" cx="${sx(p.x)}" cy="${sy(p.y)}" ` +
+                `r="15" tabindex="0" role="button" aria-label="Drag ${k}"/>` +
+                `<circle class="handle-ring" cx="${sx(p.x)}" cy="${sy(p.y)}" r="11" stroke="${col}"/>`
+            )
+            .join("");
+
+          readout(sum, cu, inSum, inCu);
+        }
+
+        const fmt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+        const pt = (p) =>
+          mode.matrix ? `diag(${fmt(p.x)}, ${fmt(p.y)})` : `(${fmt(p.x)}, ${fmt(p.y)})`;
+
+        function readout(sum, cu, inSum, inCu) {
+          const isSub = mode.zero && !mode.failsAdd && !mode.failsScale;
+          $("g2-verdict").innerHTML =
+            `${mode.title}<span class="badge ${isSub ? "badge--yes" : "badge--no"}">` +
+            `${isSub ? "subspace" : "not a subspace"}</span>`;
+          $("g2-def").textContent = mode.def;
+
+          const row = (ok, label, val) =>
+            `<span class="mark ${ok ? "ok" : "bad"}">${ok ? "✓" : "✗"}</span>` +
+            `<span class="lbl">${label}</span><span class="val">${val}</span>`;
+          $("g2-checks").innerHTML =
+            row(mode.zero, "0 ∈ W", mode.matrix ? "diag(0, 0)" : "(0, 0)") +
+            row(inSum, "u + v ∈ W", pt(sum)) +
+            row(inCu, "c·u ∈ W", pt(cu));
+          $("g2-story").textContent = mode.story;
+        }
+
+        // --- wiring ---
+        $("g2-modes").innerHTML = MODES.map(
+          (m) =>
+            `<button type="button" data-m="${m.id}" aria-pressed="${
+              m.id === mode.id
+            }">${m.label}</button>`
+        ).join("");
+
+        function setMode(id) {
+          mode = MODES.find((m) => m.id === id);
+          u = { ...mode.u };
+          v = { ...mode.v };
+          cval = mode.c;
+          $("g2-c").value = cval;
+          $("g2-c-out").textContent = cval;
+          document.querySelectorAll("#g2-modes button").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b.dataset.m === id));
+          });
+          draw();
+        }
+        document.querySelectorAll("#g2-modes button").forEach((b) => {
+          b.addEventListener("click", () => setMode(b.dataset.m));
+        });
+        $("g2-c").addEventListener("input", () => {
+          cval = Number($("g2-c").value);
+          $("g2-c-out").textContent = cval;
+          draw();
+        });
+
+        const board = $("board2");
+        function toBoard(e) {
+          const r = board.getBoundingClientRect();
+          const k = 704 / r.width;
+          return {
+            x: ((e.clientX - r.left) * k - OX) / U,
+            y: (OY - (e.clientY - r.top) * k) / U,
+          };
+        }
+
+        let dragK = null;
+        board.addEventListener("pointerdown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          dragK = h.dataset.h;
+          h.setPointerCapture(e.pointerId);
+          $("g2-hint").hidden = true;
+          e.preventDefault();
+        });
+        board.addEventListener("pointermove", (e) => {
+          if (!dragK) return;
+          const p = mode.snap(toBoard(e));
+          const t = dragK === "u" ? u : v;
+          if (p.x === t.x && p.y === t.y) return;
+          t.x = p.x;
+          t.y = p.y;
+          draw();
+        });
+        const stop = () => (dragK = null);
+        board.addEventListener("pointerup", stop);
+        board.addEventListener("pointercancel", stop);
+
+        board.addEventListener("keydown", (e) => {
+          const h = e.target.closest(".handle");
+          if (!h) return;
+          const d = {
+            ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+            ArrowUp: [0, 1], ArrowDown: [0, -1],
+          }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const t = h.dataset.h === "u" ? u : v;
+          const p = mode.snap({ x: t.x + d[0], y: t.y + d[1] });
+          t.x = p.x;
+          t.y = p.y;
+          draw();
+          const again = $("g2-handles").querySelector(
+            `.handle[data-h="${h.dataset.h}"]`
+          );
+          if (again) again.focus();
+        });
+
+        buildGrid();
+        setMode("line");
       })();
     </script>
   </body>
