@@ -478,6 +478,96 @@ def unit_circle():
               svg_doc(PW, PH, body, "The unit circle with cosine on the horizontal axis and sine on the vertical"))
 
 
+# ------------------------------------------- linear equations as dot products
+def lineq_2d():
+    """n . x = d in the plane: the solutions form a line perpendicular to n."""
+    u, ox, oy = 40, 110, 200
+
+    def W(x, y):
+        return (ox + u * x, oy - u * y)
+
+    n, d = (2, 1), 4
+    nn = n[0] ** 2 + n[1] ** 2                       # 5
+    foot = (d / nn * n[0], d / nn * n[1])            # (1.6, 0.8)
+
+    body = plate_at(u, ox, oy, (-2, 6), (-2, 5))
+    # the solution set: 2x + y = 4
+    body.append(line(W(-0.6, 5.2), W(3.3, -2.6), P["ochre"], 7, 0.28))
+    body.append(line(W(-0.6, 5.2), W(3.3, -2.6), P["ochre"], 1.8, 0.9))
+    # origin to the nearest point on it, which lies along n
+    body.append(halo(W(0, 0), W(*foot), P["ink900"], 10, 0.22))
+    body.append(arrow(W(0, 0), W(*n), P["clay"], 3.0))
+    body.append(right_angle(W(*foot), unit(W(*foot), W(0, 0)),
+                            unit(W(*foot), W(-0.6, 5.2)), 10, P["ink400"]))
+    for pt, r in ((foot, 4.5), ((0, 0), 4)):
+        body.append(f'<circle cx="{W(*pt)[0]:.1f}" cy="{W(*pt)[1]:.1f}" '
+                    f'r="{r}" fill="{P["ink900"]}"/>')
+
+    body.append(text(*W(2.4, 1.3), "n", P["clay"], 16, "serif", italic=True, boxed=BG))
+    body.append(text(*W(-0.2, 1.45), "d / |n|", P["ink900"], 12, boxed=BG))
+    body.append(text(*W(3.55, -1.35), "2x + y = 4", P["ochre"], 12, boxed=BG))
+
+    write_svg("assets/figures/lineq-2d.svg",
+              svg_doc(PW, PH, body,
+                      "The line 2x plus y equals 4 with the normal vector n perpendicular to it"))
+
+
+def lineq_3d():
+    """The same picture one dimension up: one equation, a plane, one normal."""
+    import math
+
+    yaw, pitch, k, ox, oy = 0.62, 0.42, 40, 182, 172
+    ct, st, cp, sp = math.cos(yaw), math.sin(yaw), math.cos(pitch), math.sin(pitch)
+    rgt, upv = (-st, ct, 0.0), (-sp * ct, -sp * st, cp)
+    dot3 = lambda a, b: a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+
+    def pr(v):
+        return (ox + k * dot3(v, rgt), oy - k * dot3(v, upv))
+
+    n, d = (1, 1, 3), 5
+    foot = tuple(d / dot3(n, n) * c for c in n)
+    e1 = (0.70711, -0.70711, 0.0)          # perpendicular to n
+    e2 = (0.63960, 0.63960, -0.42640)      # and to e1
+    R = 2.6
+
+    def on(s_, t_):
+        return tuple(foot[i] + s_ * e1[i] + t_ * e2[i] for i in range(3))
+
+    body = [f'<rect x="0.5" y="0.5" width="{PW - 1}" height="{PH - 1}" rx="10" '
+            f'fill="{P["sand100"]}" stroke="{P["sand400"]}" stroke-width="1"/>']
+    for ax in ((3.4, 0, 0), (0, 3.4, 0), (0, 0, 3.4)):
+        body.append(line(pr(tuple(-c for c in ax)), pr((0, 0, 0)),
+                         P["faint"], 1.1, dash="4 5"))
+        body.append(line(pr((0, 0, 0)), pr(ax), P["axis"], 1.3))
+
+    quad = [pr(on(-R, -R)), pr(on(R, -R)), pr(on(R, R)), pr(on(-R, R))]
+    body.append('<path d="M' + " L".join(f"{x:.1f},{y:.1f}" for x, y in quad)
+                + f' Z" fill="{P["ochre"]}" fill-opacity="0.2"/>')
+    for i in range(-2, 3):
+        t_ = i * R / 2
+        body.append(line(pr(on(t_, -R)), pr(on(t_, R)), P["ochre"], 1.0, 0.55))
+        body.append(line(pr(on(-R, t_)), pr(on(R, t_)), P["ochre"], 1.0, 0.55))
+
+    body.append(line(pr((0, 0, 0)), pr(foot), P["ink900"], 10, 0.22))
+    body.append(line(pr((0, 0, 0)), pr(foot), P["ink900"], 1.4, 0.9, dash="5 4"))
+    body.append(arrow(pr((0, 0, 0)), pr(n), P["clay"], 3.0))
+    for pt, r in ((foot, 4.5), ((0, 0, 0), 4)):
+        body.append(f'<circle cx="{pr(pt)[0]:.1f}" cy="{pr(pt)[1]:.1f}" '
+                    f'r="{r}" fill="{P["ink900"]}"/>')
+
+    body.append(text(pr(n)[0] + 20, pr(n)[1] - 4, "n", P["clay"], 16,
+                     "serif", italic=True, boxed=BG))
+    body.append(text(pr(foot)[0] - 46, pr(foot)[1] + 18, "d / |n|",
+                     P["ink900"], 12, boxed=BG))
+    for lab, ax in (("x", (3.4, 0, 0)), ("y", (0, 3.4, 0)), ("z", (0, 0, 3.4))):
+        t = pr(tuple(c * 1.15 for c in ax))
+        body.append(text(t[0], t[1], lab, P["ink400"], 14, "serif", italic=True))
+
+    write_svg("assets/figures/lineq-3d.svg",
+              svg_doc(PW, PH, body,
+                      "A plane in space with its normal vector n running perpendicular to it"))
+
+
 if __name__ == "__main__":
     standard_basis()
     custom_basis()
@@ -494,3 +584,5 @@ if __name__ == "__main__":
     pythag_c()
     pythag_ab()
     unit_circle()
+    lineq_2d()
+    lineq_3d()

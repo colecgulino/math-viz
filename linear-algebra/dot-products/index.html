@@ -112,6 +112,12 @@
         color: var(--ink-400);
       }
 
+      /* Terms carried through a substitution. */
+      .calc b {
+        color: var(--clay-600);
+        font-weight: 500;
+      }
+
       /* ---- board ---- */
       .board-col {
         display: flex;
@@ -573,6 +579,191 @@
           is how distance gets carried into spaces you cannot draw: define a dot
           product, and length, angle, and perpendicularity all follow from it
           for free.
+        </p>
+      </section>
+
+      <section>
+        <h2>A linear equation is a dot product</h2>
+        <p>
+          Every linear equation, in any number of unknowns, has the same shape:
+          a fixed list of coefficients, multiplied against the unknowns one for
+          one, and added up.
+        </p>
+        <div class="calc">a₁x₁ + a₂x₂ + … + aₙxₙ &nbsp;=&nbsp; d</div>
+        <p>
+          The left-hand side is a dot product and nothing else. Collect the
+          coefficients into a vector <span class="sym">n</span> and the unknowns
+          into <span class="sym">x</span>, and the whole equation collapses to
+          three symbols:
+        </p>
+        <div class="calc">n · x &nbsp;=&nbsp; d</div>
+        <p>
+          The rewriting costs nothing, and it buys everything above.
+          <span class="sym">n</span> · <span class="sym">x</span> measures how
+          far <span class="sym">x</span> reaches along
+          <span class="sym">n</span> — the shadow, scaled by |n|. So the
+          equation is asking for exactly one thing: <strong>keep every vector
+          whose shadow on <span class="sym">n</span> comes out to a particular
+          length.</strong>
+        </p>
+        <p>
+          Nothing else about <span class="sym">x</span> is constrained, and that
+          is the whole geometry of a single linear equation. Slide
+          <span class="sym">x</span> in any direction perpendicular to
+          <span class="sym">n</span> and its shadow does not move, so it is
+          still a solution. One equation pins down one number about
+          <span class="sym">x</span> — the amount along
+          <span class="sym">n</span> — and leaves every perpendicular direction
+          completely free. One equation, one degree of freedom gone.
+        </p>
+        <div class="calc">
+          in ℝ² &nbsp;&nbsp;ax + by = d
+          <span class="muted">&nbsp;&nbsp;→ a line</span><br />
+          in ℝ³ &nbsp;&nbsp;ax + by + cz = d
+          <span class="muted">&nbsp;&nbsp;→ a plane</span><br />
+          in ℝⁿ &nbsp;&nbsp;n · x = d
+          <span class="muted">&nbsp;&nbsp;→ a hyperplane, dimension n − 1</span>
+        </div>
+
+        <h3>Why ax + by + cz = d is a plane</h3>
+        <p>
+          Put <span class="sym">n</span> = (a, b, c) and
+          <span class="sym">x</span> = (x, y, z). Then ax + by + cz is literally
+          <span class="sym">n</span> · <span class="sym">x</span>, and there are
+          two short arguments — one taking the solution set apart, one building
+          it up.
+        </p>
+        <p>
+          <strong>Subtract two solutions.</strong> Suppose
+          <span class="sym">p</span> and <span class="sym">q</span> both satisfy
+          the equation:
+        </p>
+        <div class="calc">
+          n · p = d &nbsp;&nbsp;and&nbsp;&nbsp; n · q = d<br />
+          ⟹ &nbsp;n · (p − q) &nbsp;=&nbsp; d − d &nbsp;=&nbsp; <b>0</b>
+        </div>
+        <p>
+          Every direction running from one solution to another is perpendicular
+          to <span class="sym">n</span>. In space the directions perpendicular
+          to a fixed non-zero <span class="sym">n</span> form a two-dimensional
+          set, so the solution set is two-dimensional and flat. That is a plane.
+        </p>
+        <p>
+          <strong>Or build it from one point.</strong> Find any single solution
+          <span class="sym">p₀</span>, then add any
+          <span class="sym">w</span> perpendicular to
+          <span class="sym">n</span>:
+        </p>
+        <div class="calc">
+          n · (p₀ + w) &nbsp;=&nbsp; n · p₀ + n · w &nbsp;=&nbsp; d + <b>0</b>
+          &nbsp;=&nbsp; d
+        </div>
+        <p>
+          Still a solution. So the solution set is exactly one point plus the
+          whole plane of vectors perpendicular to
+          <span class="sym">n</span> — a two-dimensional
+          <a href="../vector-spaces/">subspace</a>, shifted off the origin to
+          pass through <span class="sym">p₀</span>.
+        </p>
+
+        <h3>Why n = (a, b, c) is the normal</h3>
+        <p>
+          It falls straight out of the first argument.
+          <span class="sym">n</span> is perpendicular to every direction lying
+          inside the solution set, and being perpendicular to everything in a
+          plane is exactly what it means to be normal to it. The coefficients
+          were never arbitrary bookkeeping — they are the components of the one
+          direction the plane does not contain.
+        </p>
+
+        <figure class="two-up">
+          <div>
+            <img
+              src="../../assets/figures/lineq-2d.svg"
+              alt="The line 2x plus y equals 4 drawn in the plane, with the vector n perpendicular to it and the distance from the origin marked."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">2x + y = 4</p>
+          </div>
+          <div>
+            <img
+              src="../../assets/figures/lineq-3d.svg"
+              alt="A plane floating in space with the vector n rising perpendicular to it from the origin."
+              width="364"
+              height="306"
+            />
+            <p class="fig-cap">ax + by + cz = d</p>
+          </div>
+          <figcaption>
+            The same construction, one dimension apart.
+            <span class="sym">n</span> stands perpendicular to the solution set,
+            and the shortest path from the origin runs straight along it.
+          </figcaption>
+        </figure>
+
+        <p>
+          There is a second way to see it. Read
+          f(<span class="sym">x</span>) =
+          <span class="sym">n</span> · <span class="sym">x</span> as a function
+          handing every point a number. Moving along
+          <span class="sym">n</span> increases that number as fast as possible;
+          moving perpendicular to <span class="sym">n</span> does not change it
+          at all. So ax + by + cz = d is a <em>level set</em> of f, and level
+          sets always run perpendicular to the direction of steepest change.
+          That is the gradient, in embryo.
+        </p>
+
+        <h3>Reading n · x = d directly</h3>
+        <p>
+          Divide both sides by |n| and the equation says something you could
+          check with a ruler:
+        </p>
+        <div class="calc">(n / |n|) · x &nbsp;=&nbsp; d / |n|</div>
+        <p>
+          The left side is now the signed length of
+          <span class="sym">x</span>'s shadow on the unit vector
+          <span class="sym">n̂</span> — pure geometry, with the scaling divided
+          out. So the plane is the set of points whose shadow on
+          <span class="sym">n̂</span> equals d / |n|, and that one number is
+          also the distance from the origin to the plane: the closest point is
+          the one sitting straight out along <span class="sym">n̂</span>, and
+          its distance is its shadow.
+        </p>
+        <p>
+          Four things fall out of that reading.
+          <strong>d = 0</strong> puts the plane through the origin, where the
+          equation reads <span class="sym">n</span> · <span class="sym">x</span>
+          = 0 — precisely "perpendicular to <span class="sym">n</span>" — and
+          the solution set is a genuine subspace.
+          <strong>d ≠ 0</strong> gives the same plane slid along
+          <span class="sym">n̂</span>, parallel to the first but no longer a
+          subspace, since <strong>0</strong> is no longer on it.
+          <strong>Scaling the equation changes nothing:</strong> (2a, 2b, 2c) ·
+          <span class="sym">x</span> = 2d describes the identical plane, because
+          only the direction of <span class="sym">n</span> and the ratio d / |n|
+          survive. A plane has one normal <em>direction</em>, not one normal
+          vector. And the <strong>sign of d</strong> decides which side of the
+          origin it sits on.
+        </p>
+
+        <h3>One equation, or a stack of them</h3>
+        <p>
+          A system <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> is several of these at once. Each row of
+          <span class="sym">A</span> is a normal vector, each row of the system
+          is a hyperplane, and a solution is a point lying on all of them
+          simultaneously. Solving a linear system is intersecting hyperplanes —
+          three planes in space, generically crossing at a single point.
+        </p>
+        <p>
+          That is the row picture, and it is half the story.
+          <a href="../column-spaces/">Column spaces</a> reads the very same
+          <span class="sym">A</span><span class="sym">x</span> =
+          <span class="sym">b</span> down the columns instead, where the
+          question becomes whether <span class="sym">b</span> can be built out
+          of them. Identical symbols, two completely different pictures, both of
+          them true.
         </p>
       </section>
 

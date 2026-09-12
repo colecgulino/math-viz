@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 364 306" width="364" height="306" role="img" aria-label="The line 2x plus y equals 4 with the normal vector n perpendicular to it">
+  <rect x="0.5" y="0.5" width="363" height="305" rx="10" fill="#f6efe3" stroke="#d9c9ae" stroke-width="1"/>
+  <polyline points="30.0,6.0 30.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="70.0,6.0 70.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="110.0,6.0 110.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="150.0,6.0 150.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="190.0,6.0 190.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="230.0,6.0 230.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="270.0,6.0 270.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="310.0,6.0 310.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="350.0,6.0 350.0,300.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,280.0 358.0,280.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,240.0 358.0,240.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,200.0 358.0,200.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,160.0 358.0,160.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,120.0 358.0,120.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,80.0 358.0,80.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,40.0 358.0,40.0" fill="none" stroke="#d6c6ac" stroke-width="1.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="6.0,200.0 358.0,200.0" fill="none" stroke="#9c8f7c" stroke-width="1.3" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="110.0,6.0 110.0,300.0" fill="none" stroke="#9c8f7c" stroke-width="1.3" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="86.0,-8.0 242.0,304.0" fill="none" stroke="#c99a2e" stroke-width="7" stroke-opacity="0.28" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="86.0,-8.0 242.0,304.0" fill="none" stroke="#c99a2e" stroke-width="1.8" stroke-opacity="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="110.0,200.0 174.0,168.0" fill="none" stroke="#2f2a25" stroke-width="10" stroke-opacity="0.22" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="110.0,200.0 180.2,164.9" fill="none" stroke="#bf5b2e" stroke-width="3.0" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M190.0,160.0 L181.6,170.1 L176.9,160.6 Z" fill="#bf5b2e" fill-opacity="1.0"/>
+  <polyline points="165.1,172.5 160.6,163.5 169.5,159.1" fill="none" stroke="#8a8074" stroke-width="1.3" stroke-opacity="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="174.0" cy="168.0" r="4.5" fill="#2f2a25"/>
+  <circle cx="110.0" cy="200.0" r="4" fill="#2f2a25"/>
+  <rect x="197.3" y="137.0" width="17.3" height="22.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="206.0" y="148.0" fill="#bf5b2e" font-family="Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif" font-size="16" text-anchor="middle" dominant-baseline="middle" font-style="italic">n</text>
+  <rect x="71.5" y="133.0" width="61.1" height="18.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="102.0" y="142.0" fill="#2f2a25" font-family="ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace" font-size="12" text-anchor="middle" dominant-baseline="middle">d / |n|</text>
+  <rect x="210.3" y="245.0" width="83.4" height="18.0" rx="3" fill="#f6efe3" opacity="0.9"/><text x="252.0" y="254.0" fill="#c99a2e" font-family="ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace" font-size="12" text-anchor="middle" dominant-baseline="middle">2x + y = 4</text>
+</svg>
